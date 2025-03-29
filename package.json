@@ -4,7 +4,7 @@
   "description": "Free pascal compile and build.",
   "version": "1.1.9",
   "engines": {
-    "vscode": "^1.44.0"
+    "vscode": "^1.75.0"
   },
   "icon": "images/logo.png",
   "categories": [
@@ -152,9 +152,9 @@
             "type": "string",
             "description": "%task.cleanExt%"
           },
-          "inherited":{
-             "type":"string",
-             "description": "%task.inherited%"
+          "inherited": {
+            "type": "string",
+            "description": "%task.inherited%"
           },
           "windows": {
             "type": "object",
@@ -192,29 +192,29 @@
               }
             }
           },
-          "buildEvent":{
-            "type":"object",
-            "description": "Event to run command." ,
+          "buildEvent": {
+            "type": "object",
+            "description": "Event to run command.",
             "properties": {
-              "before_build":{
-                "type":"array",
+              "before_build": {
+                "type": "array",
                 "description": "Run commands before build.",
                 "items": {
-                  "type":"string"
+                  "type": "string"
                 }
               },
-              "after_build_success":{
-                "type":"array",
+              "after_build_success": {
+                "type": "array",
                 "description": "Run commands after build success.",
                 "items": {
-                  "type":"string"
+                  "type": "string"
                 }
               },
-              "after_build_failure":{
-                "type":"array",
+              "after_build_failure": {
+                "type": "array",
                 "description": "Run commands after build failure.",
                 "items": {
-                  "type":"string"
+                  "type": "string"
                 }
               }
             }
@@ -285,15 +285,15 @@
                   4
                 ]
               },
-              "forceRebuild":{
-                "type":"boolean",
+              "forceRebuild": {
+                "type": "boolean",
                 "description": "%task.buildOption.forceRebuild%",
-                "default":false
+                "default": false
               },
-              "msgIgnore":{
-                "type":"array",
+              "msgIgnore": {
+                "type": "array",
                 "items": {
-                  "type":"number"
+                  "type": "number"
                 },
                 "description": "%task.buildOption.msgIgnore%"
               },
@@ -341,7 +341,6 @@
           "when": "view == FpcProjectExplorer && viewItem==fpcbuild",
           "group": "inline"
         }
-      
       ]
     },
     "configuration": [
@@ -411,14 +410,13 @@
           },
           "fpctoolkit.format.enabled": {
             "type": "boolean",
-            "default":"true",
+            "default": "true",
             "description": "%config.format.enabled%"
           },
           "fpctoolkit.format.cfgpath": {
             "type": "string",
             "description": "%config.format.cfgpath%"
           }
-
         }
       },
       {
@@ -534,18 +532,17 @@
       {
         "name": "fpc",
         "owner": "external",
+        "fileLocation": [
+          "absolute"
+        ],
         "pattern": [
           {
-            "regexp": "Compiling ([^\\s].*(p|pp|pas|lpr|dpr|inc))$",
-            "file": 1
-          },
-          {
-            "regexp": "^([\\w]+\\.(p|pp|pas|lpr|dpr|inc))\\((\\d+)\\,(\\d+)\\)\\s(Fatal|Error|Warning|Note):(.*)",
+            "regexp": "^([\\w\\/\\.]+\\.(dpr|p|pp|pas))\\((\\d+),(\\d+)\\)\\s((Fatal|Error|Warning|Note):\\s.*)",
+            "file": 1,
             "line": 3,
             "column": 4,
-            "severity": 5,
-            "message": 6,
-            "loop": true
+            "message": 5,
+            "severity": 6
           }
         ]
       }
