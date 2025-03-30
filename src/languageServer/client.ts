@@ -90,40 +90,18 @@ function GetEnvironmentVariables(): {} {
     let PP = settingEnvironmentVariables.get<string>('PP');
     if (PP === undefined || PP === '') //not init
     {
-        if (plat === 'win32') {
-            ///3.2.2/bin/i386-win32/fpc.exe
-            //search lazarus
-            let dirs = ['C:/lazarus/fpc', 'C:/FPC'];
-            let ver_test = /\d+\.\d+\.\d+/;
-            for (const _dir of dirs) {
-                if (fs.pathExistsSync(_dir)) {
-                    let subdirs = fs.readdirSync(_dir);
-                    for (const fpcver of subdirs) {
-                        if (ver_test.test(fpcver)) { //found it 
-                            if (_dir.startsWith('C:/lazarus')) {
-                                userEnvironmentVariables['LAZARUSDIR'] = 'C:/lazarus';
-                                env['LAZARUSDIR'] = userEnvironmentVariables['LAZARUSDIR'];
-                            }
-                            userEnvironmentVariables['PP'] = path.join(_dir, fpcver, 'bin', 'i386-win32', 'fpc.exe');
-                            userEnvironmentVariables['FPCDIR'] = path.join(_dir, fpcver, 'source');
-                            env['PP'] = userEnvironmentVariables['PP'];
-
-                            return userEnvironmentVariables;
-                        }
-                    }
-                }
+        let dirs = ['/usr/bin/fpc', '/usr/local/bin/fpc'];
+        for (const _dir of dirs) {
+            if (fs.existsSync(_dir)) {
+                userEnvironmentVariables['PP'] = _dir;
             }
-        } else {
-            let dirs = ['/usr/bin/fpc', '/usr/local/bin/fpc'];
-            let ver_test = new RegExp('\d+\.\d+\.\d+');
-            for (const _dir of dirs) {
-                if (fs.existsSync(_dir)) {
-                    userEnvironmentVariables['PP'] = _dir;
-                }
-            }
-            if (fs.existsSync('/usr/share/fpcsrc/3.2.2')) {
-                userEnvironmentVariables['FPCDIR'] = '/usr/share/fpcsrc/3.2.2';
-            }
+        }
+    }
+    let FPCDIR = settingEnvironmentVariables.get<string>('FPCDIR');
+    if (FPCDIR === undefined || FPCDIR === '') //not init
+    {
+        if (fs.existsSync('/usr/share/fpcsrc/3.2.2')) {
+            userEnvironmentVariables['FPCDIR'] = '/usr/share/fpcsrc/3.2.2';
         }
     }
 
