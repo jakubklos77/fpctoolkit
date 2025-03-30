@@ -121,8 +121,8 @@ function GetEnvironmentVariables(): {} {
                     userEnvironmentVariables['PP'] = _dir;
                 }
             }
-            if (fs.existsSync('/usr/local/share/fpcsrc')) {
-                userEnvironmentVariables['FPCDIR'] = '/usr/local/share/fpcsrc';
+            if (fs.existsSync('/usr/share/fpcsrc/3.2.2')) {
+                userEnvironmentVariables['FPCDIR'] = '/usr/share/fpcsrc/3.2.2';
             }
         }
     }
