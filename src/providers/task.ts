@@ -23,6 +23,7 @@ export class BuildOption {
 	syntaxMode?: string;
 	forceRebuild?: boolean = false;
 	msgIgnore?: Number[];
+	lazbuild?: boolean;
 };
 
 export class BuildEvent{
@@ -190,9 +191,17 @@ export class FpcTask extends vscode.Task {
 				if (realDefinition === undefined) {
 					realDefinition = taskDefinition;
 				}
+				let lazbuild: boolean = false;
+				let forceRebuild: boolean = false;
+
 				if (realDefinition?.buildOption) {
-					let opt: CompileOption = new CompileOption(realDefinition);
-					buildOptionString = opt.toOptionString();
+					lazbuild = realDefinition.buildOption.lazbuild ?? false;
+					forceRebuild = realDefinition.buildOption.forceRebuild ?? false;
+
+					if (!lazbuild) {
+						let opt: CompileOption = new CompileOption(realDefinition);
+						buildOptionString = opt.toOptionString();
+					}
 				}
 				if (!buildOptionString) {
 					buildOptionString = "";
@@ -206,11 +215,17 @@ export class FpcTask extends vscode.Task {
 					};
 
 				}
-				//buildOptionString += '-vq '; //show message numbers 
+
+				if (!lazbuild) {
+					buildOptionString += '-vq '; //show message numbers 
+				}
 
 				let fpcpath = process.env['PP'];//  configuration.get<string>('env.PP');
 				if (fpcpath === '') {
 					fpcpath = 'fpc';
+				}
+				if (lazbuild) {
+					fpcpath = 'lazbuild';
 				}
 
 				let terminal = new FpcBuildTaskTerminal(cwd, fpcpath!);
@@ -246,7 +261,7 @@ export class FpcTask extends vscode.Task {
 				}
 				
 				terminal.args = `${taskDefinition?.file} ${buildOptionString}`.trim().split(' ');
-				if (this._BuildMode == BuildMode.rebuild) {
+				if (this._BuildMode == BuildMode.rebuild || forceRebuild) {
 					terminal.args.push('-B');
 				}
 				return terminal;
