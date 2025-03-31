@@ -86,11 +86,17 @@ function GetEnvironmentVariables(): {} {
             }
         }
     });
+
     //set default value
     let PP = settingEnvironmentVariables.get<string>('PP');
-    if (PP === undefined || PP === '') //not init
-    {
-        if (plat === 'win32') {
+    let FPCDIR = settingEnvironmentVariables.get<string>('FPCDIR');
+
+    // windows
+    if (plat === 'win32') {
+
+        if (PP === undefined || PP === '') //not init
+        {
+
             ///3.2.2/bin/i386-win32/fpc.exe
             //search lazarus
             let dirs = ['C:/lazarus/fpc', 'C:/FPC'];
@@ -113,7 +119,13 @@ function GetEnvironmentVariables(): {} {
                     }
                 }
             }
-        } else {
+        }
+
+    // linux
+    } else {
+
+        if (PP === undefined || PP === '') //not init
+        {
             let dirs = ['/usr/bin/fpc', '/usr/local/bin/fpc'];
             let ver_test = new RegExp('\d+\.\d+\.\d+');
             for (const _dir of dirs) {
@@ -121,6 +133,12 @@ function GetEnvironmentVariables(): {} {
                     userEnvironmentVariables['PP'] = _dir;
                 }
             }
+            if (fs.existsSync('/usr/share/fpcsrc/3.2.2')) {
+                userEnvironmentVariables['FPCDIR'] = '/usr/share/fpcsrc/3.2.2';
+            }
+        }
+        if (FPCDIR === undefined || FPCDIR === '') //not init
+        {
             if (fs.existsSync('/usr/share/fpcsrc/3.2.2')) {
                 userEnvironmentVariables['FPCDIR'] = '/usr/share/fpcsrc/3.2.2';
             }
