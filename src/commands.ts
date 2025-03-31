@@ -26,7 +26,8 @@ export class FpcCommandManager {
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.load', this.ProjectLoad));
         
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.complete',this.CodeComplete));
-        context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.multilinetrim',this.MultilineTrim));
+        context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.rename',this.CodeRename));
+        context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.trimfromcursor',this.TrimFromCursor));
     }
     ProjectAdd = async (node: FpcItem) => {
         if (node.level === 0) {
@@ -150,7 +151,7 @@ export class FpcCommandManager {
         client.restart();
 
     };
-    MultilineTrim = async (textEditor: TextEditor, edit: TextEditorEdit) => {
+    TrimFromCursor = async (textEditor: TextEditor, edit: TextEditorEdit) => {
 
         const editor = vscode.window.activeTextEditor;
 
@@ -311,8 +312,13 @@ end.`;
     }
 
 
-    CodeComplete= async (textEditor: TextEditor, edit: TextEditorEdit) => {
+    CodeComplete = async (textEditor: TextEditor, edit: TextEditorEdit) => {
         client.doCodeComplete(textEditor);
+      
+    }
+
+    CodeRename = async (textEditor: TextEditor, edit: TextEditorEdit) => {
+        client.doCodeRename(textEditor);
       
     }
 }

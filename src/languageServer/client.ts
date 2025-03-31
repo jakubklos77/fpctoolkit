@@ -444,7 +444,10 @@ export class TLangClient implements ErrorHandler {
 
     };
 
-    async doCodeCompleteInternal(editor: vscode.TextEditor): Promise<void> {
+    async doCodeComplete(editor: vscode.TextEditor): Promise<void> {
+
+        // save
+        await editor.document.save();
 
         let sel = editor.selection.start;
         var req: ExecuteCommandParams = {
@@ -477,17 +480,13 @@ export class TLangClient implements ErrorHandler {
         }
     }
 
-    async doCodeComplete(editor: vscode.TextEditor): Promise<void> {
+    async doCodeRename(editor: vscode.TextEditor): Promise<void> {
 
-        if (!editor.document.isDirty) {
-            await this.doCodeCompleteInternal(editor);
-            return;
-        }
+        // save
+        await editor.document.save();
 
-        const success = await editor.document.save();
-        if (success) {
-            await this.doCodeCompleteInternal(editor);
-        }
+        // rename
+        await vscode.commands.executeCommand('editor.action.rename');
     }
 
     async getUnitPath(unitnames: string[]): Promise<string[]> {

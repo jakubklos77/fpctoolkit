@@ -125,8 +125,13 @@
       },
       {
         "key": "ctrl+t",
-        "command": "fpctoolkit.editor.multilinetrim",
+        "command": "fpctoolkit.editor.trimfromcursor",
         "when": "editorTextFocus && !isInEmbeddedEditor"
+      },
+      {
+        "key": "f2",
+        "command": "fpctoolkit.code.rename",
+        "when": "editorTextFocus"
       }
     ],
     "taskDefinitions": [
