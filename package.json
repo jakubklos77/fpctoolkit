@@ -57,6 +57,10 @@
           ".lpr"
         ],
         "configuration": "./pascal-configuration.json"
+      },
+      {
+        "id": "pascal",
+        "configuration": "./pascal-configuration.json"
       }
     ],
     "grammars": [
@@ -64,11 +68,20 @@
         "language": "objectpascal",
         "scopeName": "source.pascal",
         "path": "./syntaxes/fpc.tmLanguage"
+      },
+      {
+        "language": "pascal",
+        "scopeName": "source.pascal",
+        "path": "./syntaxes/fpc.tmLanguage"
       }
     ],
     "snippets": [
       {
         "language": "objectpascal",
+        "path": "./snippets/pascal.json"
+      },
+      {
+        "language": "pascal",
         "path": "./snippets/pascal.json"
       }
     ],
@@ -481,18 +494,18 @@
           "fpctoolkit.lsp.initializationOptions.checkSyntax": {
             "type": "boolean",
             "scope": "application",
-            "default": false,
+            "default": true,
             "description": "%lsp.initializationOptions.checkSyntax%"
           },
           "fpctoolkit.lsp.initializationOptions.publishDiagnostics": {
             "type": "boolean",
             "scope": "application",
-            "default": false,
+            "default": true,
             "description": "%lsp.initializationOptions.publishDiagnostics%"
           },
           "fpctoolkit.lsp.initializationOptions.workspaceSymbols": {
             "type": "boolean",
-            "default": false,
+            "default": true,
             "description": "%lsp.initializationOptions.workspaceSymbols%"
           },
           "fpctoolkit.lsp.initializationOptions.documentSymbols": {
