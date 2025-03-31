@@ -312,7 +312,8 @@ export class FpcItem extends vscode.TreeItem {
 		public readonly file: string,
 		public fileexist: boolean,
 		public isDefault: boolean,
-		public tasks?: any[]
+		public tasks?: any[],
+		public forceRebuild?: boolean,
 	) {
 		super(label, collapsibleState);
 		if (level === 0) {

@@ -84,7 +84,8 @@ export class FpcCommandManager {
         }
 
     };
-    ProjectBuild = async (node: FpcItem) => {
+
+    ProjectBuildInternal = async (node: FpcItem) => {
         if (node.level === 0) {
 
         } else {
@@ -94,7 +95,11 @@ export class FpcCommandManager {
                     if (task.name === node.label) {
                         let newtask=taskProvider.taskMap.get(task.name);
                         if(newtask){
-                            (newtask as FpcTask).BuildMode=BuildMode.normal;   
+                            if (!node.forceRebuild) {
+                                (newtask as FpcTask).BuildMode=BuildMode.normal;   
+                            } else {
+                                (newtask as FpcTask).BuildMode=BuildMode.rebuild;   
+                            }
                         }
                         vscode.tasks.executeTask(task);
 
@@ -108,32 +113,21 @@ export class FpcCommandManager {
 
     };
 
+    ProjectBuild = async (node: FpcItem) => {
+
+        node.forceRebuild = false;
+        this.ProjectBuildInternal(node);
+
+    };
+
     ProjectReBuild = async (node: FpcItem) => {
 
         if (node.level === 0) {
 
         } else {
             await this.projectClean(node);
-            this.ProjectBuild(node);
-
-            // vscode.tasks.fetchTasks({ type: 'fpc' }).then((e) => {
-
-            //     for (const task of e) {
-            //         if (task.name === node.label) {
-            //             let newtask=taskProvider.taskMap.get(task.name);
-            //             if(newtask){
-            //                 (newtask as FpcTask).BuildMode=BuildMode.rebuild;   
-            //             }
-                        
-            //             vscode.tasks.executeTask(task).then((e)=>{
-            //                 console.log(e.task.name);
-            //             });
-
-            //             return;
-            //         }
-   
-            //     }
-            // });
+            node.forceRebuild = true;
+            this.ProjectBuildInternal(node);
 
         }
 

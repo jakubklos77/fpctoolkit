@@ -322,11 +322,6 @@
           "group": "fpcproject@2"
         },
         {
-          "command": "fpctoolkit.project.clean",
-          "when": "view == FpcProjectExplorer && viewItem==fpcbuild",
-          "group": "fpcproject@3"
-        },
-        {
           "command": "fpctoolkit.project.setdefault",
           "when": "view == FpcProjectExplorer && viewItem==fpcbuild",
           "group": "fpcprojectcfg@4"
