@@ -99,6 +99,10 @@
         "title": "%project.newconfig%"
       },
       {
+        "command": "fpctoolkit.project.load",
+        "title": "%project.load%"
+      },
+      {
         "command": "fpctoolkit.project.setdefault",
         "title": "%project.setdefault%"
       }
@@ -117,6 +121,11 @@
       {
         "key": "ctrl+shift+c",
         "command": "fpctoolkit.code.complete",
+        "when": "editorTextFocus && !isInEmbeddedEditor"
+      },
+      {
+        "key": "ctrl+t",
+        "command": "fpctoolkit.editor.multilinetrim",
         "when": "editorTextFocus && !isInEmbeddedEditor"
       }
     ],
@@ -314,9 +323,9 @@
           "group": "fpcprojectcfg@4"
         },
         {
-          "command": "fpctoolkit.project.add",
+          "command": "fpctoolkit.project.load",
           "when": "view == FpcProjectExplorer && viewItem==fpcproject",
-          "group": "fpcproject@0"
+          "group": "fpcproject@1"
         },
         {
           "command": "fpctoolkit.project.build",
@@ -349,6 +358,10 @@
               "type": "string"
             },
             "description": "%config.customOptions%"
+          },
+          "fpctoolkit.currentProject": {
+            "type": "string",
+            "description": "%config.currentProject%"
           },
           "fpctoolkit.env.PP": {
             "type": "string",

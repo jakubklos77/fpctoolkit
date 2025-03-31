@@ -18,13 +18,15 @@ export class FpcCommandManager {
     registerAll(context: vscode.ExtensionContext) {
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.build', this.ProjectBuild));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.rebuild', this.ProjectReBuild));
-        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.clean', this.projectClean));
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.clean', this.ProjectClean));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.opensetting', this.ProjectOpen));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.newproject', this.ProjectNew));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.add', this.ProjectAdd));
-        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.setdefault', this.projectSetDefault));
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.setdefault', this.ProjectSetDefault));
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.load', this.ProjectLoad));
         
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.complete',this.CodeComplete));
+        context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.multilinetrim',this.MultilineTrim));
     }
     ProjectAdd = async (node: FpcItem) => {
         if (node.level === 0) {
@@ -125,7 +127,7 @@ export class FpcCommandManager {
         if (node.level === 0) {
 
         } else {
-            await this.projectClean(node);
+            await this.ProjectClean(node);
             node.forceRebuild = true;
             this.ProjectBuildInternal(node);
 
@@ -138,6 +140,38 @@ export class FpcCommandManager {
         let doc = await vscode.workspace.openTextDocument(file);
         let te = await vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
 
+    };
+    ProjectLoad = async (node?: FpcItem) => {
+
+        // save current project
+        const config = vscode.workspace.getConfiguration();
+        await config.update('fpctoolkit.currentProject', node?.file, vscode.ConfigurationTarget.Global); 
+
+        client.restart();
+
+    };
+    MultilineTrim = async (textEditor: TextEditor, edit: TextEditorEdit) => {
+
+        const editor = vscode.window.activeTextEditor;
+
+        if (editor) {
+            const cursorPosition = editor.selection.active; // Get current cursor position
+
+            // Get the full text from the cursor to the end of the document
+            const documentText = editor.document.getText();
+            const textAfterCursor = documentText.slice(editor.document.offsetAt(cursorPosition));
+
+            // Regular expression to match leading spaces, blank lines, and trim them
+            const trimmedText = textAfterCursor.replace(/^\s*\n*/, '');  // Remove leading blank lines and spaces
+
+            // Get the range from the cursor to the end of the document
+            const range = new vscode.Range(cursorPosition, editor.document.positionAt(documentText.length));
+
+            // Perform the text replacement with the trimmed text
+            await editor.edit(editBuilder => {
+                editBuilder.replace(range, trimmedText);
+            });
+        }        
     };
     ProjectNew = async () => {
 
@@ -196,7 +230,7 @@ end.`;
         );
 
     };
-    projectClean = async (node: FpcItem) => {
+    ProjectClean = async (node: FpcItem) => {
 
         let definition = taskProvider.GetTaskDefinition(node.label);
 
@@ -250,7 +284,7 @@ end.`;
         }
     };
 
-    projectSetDefault = async (node: FpcItem) => {
+    ProjectSetDefault = async (node: FpcItem) => {
         let config = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(this.workspaceRoot));
         let tasks=config.tasks;
         for (const task of tasks) {
