@@ -3,7 +3,6 @@
 
 ![FreePascal Toolkit preview](images/doc/fpctoolkit.gif)
 
-[中文文档](README_CN.md)
 ## Requirements
 
 - Install [Lazarus](https://www.lazarus-ide.org/) or  [FreePascal](https://www.freepascal.org/download.var)  on your system. 
