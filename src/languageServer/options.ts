@@ -271,6 +271,10 @@ export class InitializationOptions {
 
             // load the project file as xml
             try {
+                // chekc if file exists
+                if (!fs.existsSync(project)) 
+                    return;
+
                 const projectContent = fs.readFileSync(project, 'utf-8');
                 const parser = new (require('xml2js').Parser)();
                 parser.parseString(projectContent, (err: any, result: any) => {
