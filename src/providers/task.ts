@@ -280,6 +280,7 @@ class FpcCustomExecution extends vscode.CustomExecution {
 export var diagCollection: vscode.DiagnosticCollection = vscode.languages.createDiagnosticCollection('fpc');
 
 class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExitStatus {
+	public reason: vscode.TerminalExitReason = vscode.TerminalExitReason.Process;
 	private writeEmitter = new vscode.EventEmitter<string>();
 	onDidWrite: vscode.Event<string> = this.writeEmitter.event;
 	private closeEmitter = new vscode.EventEmitter<number>();
