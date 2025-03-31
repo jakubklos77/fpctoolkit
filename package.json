@@ -57,10 +57,6 @@
           ".lpr"
         ],
         "configuration": "./pascal-configuration.json"
-      },
-      {
-        "id": "pascal",
-        "configuration": "./pascal-configuration.json"
       }
     ],
     "grammars": [
@@ -68,20 +64,11 @@
         "language": "objectpascal",
         "scopeName": "source.pascal",
         "path": "./syntaxes/fpc.tmLanguage"
-      },
-      {
-        "language": "pascal",
-        "scopeName": "source.pascal",
-        "path": "./syntaxes/fpc.tmLanguage"
       }
     ],
     "snippets": [
       {
         "language": "objectpascal",
-        "path": "./snippets/pascal.json"
-      },
-      {
-        "language": "pascal",
         "path": "./snippets/pascal.json"
       }
     ],
