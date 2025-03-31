@@ -29,7 +29,13 @@
 		}
 	},
     "indentationRules": {
-        "increaseIndentPattern": "^\\s*(begin|if|for|while|repeat|case)\\b.*$",
-        "decreaseIndentPattern": "^\\s*(end|until)\\b.*$"
+        "increaseIndentPattern": {
+            "pattern": "^\\s*(begin|repeat|case|private|public|published|protected|var|try|finally)\\b.*$",
+            "flags": "i"
+        },
+        "decreaseIndentPattern": {
+            "pattern": "^\\s*(end)\\b.*$",
+            "flags": "i"
+        }
     }
 }
