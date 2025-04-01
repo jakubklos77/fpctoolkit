@@ -112,8 +112,12 @@
         "title": "%project.newconfig%"
       },
       {
-        "command": "fpctoolkit.project.load",
-        "title": "%project.load%"
+        "command": "fpctoolkit.project.activate",
+        "title": "%project.activate%"
+      },
+      {
+        "command": "fpctoolkit.project.checkbuildbeforedebug",
+        "title": "%project.checkbuildbeforedebug%"
       },
       {
         "command": "fpctoolkit.project.setdefault",
@@ -341,7 +345,7 @@
           "group": "fpcprojectcfg@4"
         },
         {
-          "command": "fpctoolkit.project.load",
+          "command": "fpctoolkit.project.activate",
           "when": "view == FpcProjectExplorer && viewItem==fpcproject",
           "group": "fpcproject@1"
         },

@@ -23,7 +23,8 @@ export class FpcCommandManager {
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.newproject', this.ProjectNew));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.add', this.ProjectAdd));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.setdefault', this.ProjectSetDefault));
-        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.load', this.ProjectLoad));
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.activate', this.ProjectActivate));
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.checkbuildbeforedebug', this.CheckBuildBeforeDebug));
         
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.complete',this.CodeComplete));
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.rename',this.CodeRename));
@@ -88,7 +89,7 @@ export class FpcCommandManager {
 
     };
 
-    ProjectBuildInternal = async (node: FpcItem) => {
+    ProjectBuildInternal = async (node: FpcItem, rebuild: boolean = false) => {
         if (node.level === 0) {
 
         } else {
@@ -98,7 +99,7 @@ export class FpcCommandManager {
                     if (task.name === node.label) {
                         let newtask=taskProvider.taskMap.get(task.name);
                         if(newtask){
-                            if (!node.forceRebuild) {
+                            if (!node.forceRebuild && !rebuild) {
                                 (newtask as FpcTask).BuildMode=BuildMode.normal;   
                             } else {
                                 (newtask as FpcTask).BuildMode=BuildMode.rebuild;   
@@ -118,7 +119,6 @@ export class FpcCommandManager {
 
     ProjectBuild = async (node: FpcItem) => {
 
-        node.forceRebuild = false;
         this.ProjectBuildInternal(node);
 
     };
@@ -129,8 +129,7 @@ export class FpcCommandManager {
 
         } else {
             await this.ProjectClean(node);
-            node.forceRebuild = true;
-            this.ProjectBuildInternal(node);
+            this.ProjectBuildInternal(node, true);
 
         }
 
@@ -142,13 +141,61 @@ export class FpcCommandManager {
         let te = await vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
 
     };
-    ProjectLoad = async (node?: FpcItem) => {
+    CheckBuildBeforeDebug = async (node?: FpcItem) => {
 
-        // save current project
-        const config = vscode.workspace.getConfiguration();
-        await config.update('fpctoolkit.currentProject', node?.file, vscode.ConfigurationTarget.Global); 
+         // Simulate an async operation (e.g., build check)
+         await new Promise(resolve => setTimeout(resolve, 100)); 
 
-        client.restart();
+         return ""; // Ensure the command completes
+       // todo 
+    };
+    ProjectActivate = async (node?: FpcItem) => {
+
+        // get node file
+        const wrkConfig = vscode.workspace.getConfiguration();
+        let file = node?.file;
+
+        // if set
+        if (file) {
+
+            // update current project
+            await wrkConfig.update('fpctoolkit.currentProject', file, vscode.ConfigurationTarget.Global); 
+
+            // get tasks
+            let matched = false;
+            let config = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(this.workspaceRoot));
+            let tasks=config.tasks;
+            for (const task of tasks) {
+    
+                // match our task
+                if(task.file===file && !matched){
+                    if(typeof(task.group)==='object'){
+                        task.group.isDefault=true;    
+                    }else{
+                        task.group={kind:task.group,isDefault:true};
+                    }
+
+                    matched = true;
+                   
+                // all other tasks - reset    
+                }else{
+                    if(typeof(task.group)==='object'){
+                        task.group.isDefault=undefined;
+                    }
+                }                   
+            }
+
+            // update tasks
+            config.update(
+                "tasks",
+                tasks,
+                vscode.ConfigurationTarget.WorkspaceFolder
+            );
+    
+
+            // restart LSP
+            client.restart();
+        }
 
     };
     TrimFromCursor = async (textEditor: TextEditor, edit: TextEditorEdit) => {
@@ -289,13 +336,16 @@ end.`;
         let config = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(this.workspaceRoot));
         let tasks=config.tasks;
         for (const task of tasks) {
+
+            // match our task
             if(task.label===node.label){
                 if(typeof(task.group)==='object'){
                     task.group.isDefault=true;    
                 }else{
                     task.group={kind:task.group,isDefault:true};
                 }
-                client.restart();
+               
+            // all other tasks - reset    
             }else{
                 if(typeof(task.group)==='object'){
                     task.group.isDefault=undefined;
@@ -309,6 +359,9 @@ end.`;
             tasks,
             vscode.ConfigurationTarget.WorkspaceFolder
         );
+
+        // restart LSP
+        client.restart();
     }
 
 
