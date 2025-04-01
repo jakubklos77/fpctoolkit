@@ -24,8 +24,11 @@ export class FpcCommandManager {
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.newproject', this.ProjectNew));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.add', this.ProjectAdd));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.setdefault', this.ProjectSetDefault));
-        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.activate', this.ProjectActivate));
-        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.checkbuildbeforedebug', this.CheckBuildBeforeDebug));
+        
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.activate', this.ProjectActivate));        
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.cwd', this.GetCWD));
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.program', this.GetProgram));
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.checkforrebuild', this.CheckForRebuild));
         
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.complete',this.CodeComplete));
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.rename',this.CodeRename));
@@ -134,10 +137,24 @@ export class FpcCommandManager {
         let te = await vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
 
     };
-    CheckBuildBeforeDebug = async (node?: FpcItem) => {
+    CheckForRebuild = async (node?: FpcItem) => {
 
-         await lazproject.CheckBeforeBuild();
-         return ""; 
+        await lazproject.CheckBeforeBuild();
+        return ""; 
+    };
+    GetProgram = async (node?: FpcItem) => {
+
+        let project = lazproject.LoadCurrentProjectOptions();
+        if (!project)
+            return "";
+        return project.Target; 
+    };
+    GetCWD = async (node?: FpcItem) => {
+
+        let project = lazproject.LoadCurrentProjectOptions();
+        if (!project)
+            return "";
+        return project.CWD; 
     };
     ProjectActivate = async (node?: FpcItem) => {
 

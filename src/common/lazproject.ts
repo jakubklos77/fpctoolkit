@@ -16,6 +16,7 @@ export class LazProjectOptions {
 
     SyntaxMode: string = "";
     Target: string = "";
+    CWD: string = "";
 };
 
 class LazProject {
@@ -101,6 +102,7 @@ class LazProject {
 
                         lazProjectResult.SyntaxMode = result.CONFIG.CompilerOptions[0].Parsing[0].SyntaxOptions[0].SyntaxMode[0].$.Value;
                         lazProjectResult.Target = this.replaceStringWithEnvVar(result.CONFIG.CompilerOptions[0].Target[0].Filename[0].$.Value);
+                        lazProjectResult.CWD = path.dirname(lazProjectResult.Target);
                     }
                 });
             } catch (error) {

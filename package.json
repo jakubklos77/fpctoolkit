@@ -112,12 +112,20 @@
         "title": "%project.newconfig%"
       },
       {
-        "command": "fpctoolkit.project.activate",
-        "title": "%project.activate%"
+        "command": "fpctoolkit.currentproject.activate",
+        "title": "%currentproject.activate%"
       },
       {
-        "command": "fpctoolkit.project.checkbuildbeforedebug",
-        "title": "%project.checkbuildbeforedebug%"
+        "command": "fpctoolkit.currentproject.checkforrebuild",
+        "title": "%currentproject.checkforrebuild%"
+      },
+      {
+        "command": "fpctoolkit.currentproject.program",
+        "title": "%currentproject.program%"
+      },
+      {
+        "command": "fpctoolkit.currentproject.cwd",
+        "title": "%currentproject.cwd%"
       },
       {
         "command": "fpctoolkit.project.setdefault",
@@ -345,7 +353,7 @@
           "group": "fpcprojectcfg@4"
         },
         {
-          "command": "fpctoolkit.project.activate",
+          "command": "fpctoolkit.currentproject.activate",
           "when": "view == FpcProjectExplorer && viewItem==fpcproject",
           "group": "fpcproject@1"
         },
