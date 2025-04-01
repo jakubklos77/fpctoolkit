@@ -4,6 +4,7 @@ import *  as fs from 'fs';
 import * as path from 'path';
 import { configuration } from '../common/configuration';
 import { BuildOption, FpcTaskDefinition } from '../providers/task';
+import { lazproject } from '../common/lazproject';
 export class CompileOption {
     /**
      * Compile Option
@@ -224,91 +225,6 @@ export class InitializationOptions {
         this.ignoreTextCompletions = cfg.get<boolean>('ignoreTextCompletions');
     }
 
-    private replaceStringWithEnvVar(path: string) {
-
-        // workspace
-        if (path.includes('$(ProjOutDir)')) {
-            path = path.split('$(ProjOutDir)').join(vscode.workspace.workspaceFolders![0].uri.fsPath);
-        }
-
-        // replace environment variable placeholders with actual values
-        const envVarRegex = /\$Env\(([^)]+)\)/g;
-        path = path.replace(envVarRegex, (_, envVarName) => {
-            const envValue = process.env[envVarName];
-            if (envValue) {
-                return envValue;
-            } else {
-                vscode.window.showWarningMessage(`Environment variable ${envVarName} is not defined.`);
-            return '';
-            }
-        });
-
-        return path;
-    }
-    
-    private processStringList(fpcOptions: Array<string>, option: string, split: string, value: string) {
-
-        // replace
-        value = this.replaceStringWithEnvVar(value);
-
-        // split path by ";"
-        let paths = value.split(split);
-        paths.forEach((p) => {
-            fpcOptions.push(option + p.trim());
-        });
-    }
-
-    private handleCurrentProject(fpcOptions: Array<string>) {
-        
-        // get project
-        let project = vscode.workspace.getConfiguration().get<string>('fpctoolkit.currentProject');
-        if (project) {
-            // check if relative path
-            if (!project.startsWith("/")) {
-                // expand
-                project = path.join(vscode.workspace.workspaceFolders![0].uri.fsPath, project);
-            }
-
-            // load the project file as xml
-            try {
-                // chekc if file exists
-                if (!fs.existsSync(project)) 
-                    return;
-
-                const projectContent = fs.readFileSync(project, 'utf-8');
-                const parser = new (require('xml2js').Parser)();
-                parser.parseString(projectContent, (err: any, result: any) => {
-                    if (err) {
-                        vscode.window.showErrorMessage("Failed to parse project file as XML: " + err.message);
-                        return;
-                    }
-                    // Process the parsed XML result
-                    if (result && result.CONFIG && result.CONFIG.CompilerOptions) {
-
-                        let includeFiles = result.CONFIG.CompilerOptions[0].SearchPaths[0].IncludeFiles[0].$.Value;
-                        let otherUnitFiles = result.CONFIG.CompilerOptions[0].SearchPaths[0].OtherUnitFiles[0].$.Value;
-                        let customOptions = result.CONFIG.CompilerOptions[0].Other[0].CustomOptions[0].$.Value;
-                        let syntaxMode = result.CONFIG.CompilerOptions[0].Parsing[0].SyntaxOptions[0].SyntaxMode[0].$.Value
-
-                        // mode
-                        fpcOptions.push("-M" + syntaxMode.toLowerCase());
-
-                        // options
-                        this.processStringList(fpcOptions, '-Fi', ';', includeFiles);
-                        this.processStringList(fpcOptions, '-Fu', ';', otherUnitFiles);
-                        this.processStringList(fpcOptions, '', "\n", customOptions);
-                    }
-                });
-            } catch (error) {
-                if (error instanceof Error) {
-                    vscode.window.showErrorMessage("Error reading project file: " + error.message);
-                } else {
-                    vscode.window.showErrorMessage("Error reading project file: " + String(error));
-                }
-            }
-        }        
-    }
-
     public updateByCompileOption(opt: CompileOption) {
         this.cwd = opt.cwd;
         this.program = opt.file;
@@ -322,7 +238,6 @@ export class InitializationOptions {
         });
 
         // handle current project
-        this.handleCurrentProject(fpcOptions);
-
+        lazproject.HandleCurrentProject(fpcOptions);
     }
 }

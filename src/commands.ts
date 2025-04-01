@@ -6,6 +6,7 @@ import path = require('path');
 import { BuildMode, FpcTask, FpcTaskDefinition, FpcTaskProvider, taskProvider } from './providers/task';
 import { CompileOption } from './languageServer/options';
 import { configuration } from './common/configuration'
+import { lazproject } from './common/lazproject'
 import { type } from 'os';
 import { client } from './extension';
 import { TextEditor, TextEditorEdit } from 'vscode';
@@ -88,7 +89,6 @@ export class FpcCommandManager {
         }
 
     };
-
     ProjectBuildInternal = async (node: FpcItem, rebuild: boolean = false) => {
         if (node.level === 0) {
 
@@ -116,22 +116,15 @@ export class FpcCommandManager {
         }
 
     };
-
     ProjectBuild = async (node: FpcItem) => {
 
         this.ProjectBuildInternal(node);
 
     };
-
     ProjectReBuild = async (node: FpcItem) => {
 
-        if (node.level === 0) {
-
-        } else {
-            await this.ProjectClean(node);
-            this.ProjectBuildInternal(node, true);
-
-        }
+        await this.ProjectClean(node);
+        this.ProjectBuildInternal(node, true);
 
     };
     ProjectOpen = async (node?: FpcItem) => {
@@ -143,11 +136,8 @@ export class FpcCommandManager {
     };
     CheckBuildBeforeDebug = async (node?: FpcItem) => {
 
-         // Simulate an async operation (e.g., build check)
-         await new Promise(resolve => setTimeout(resolve, 100)); 
-
-         return ""; // Ensure the command completes
-       // todo 
+         await lazproject.CheckBeforeBuild();
+         return ""; 
     };
     ProjectActivate = async (node?: FpcItem) => {
 
@@ -186,12 +176,14 @@ export class FpcCommandManager {
             }
 
             // update tasks
-            config.update(
+            await config.update(
                 "tasks",
                 tasks,
                 vscode.ConfigurationTarget.WorkspaceFolder
             );
     
+            // reload tasks
+            vscode.commands.executeCommand('workbench.action.tasks.reloadTasks');
 
             // restart LSP
             client.restart();
@@ -331,14 +323,13 @@ end.`;
             }
         }
     };
-
     ProjectSetDefault = async (node: FpcItem) => {
         let config = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(this.workspaceRoot));
         let tasks=config.tasks;
         for (const task of tasks) {
 
             // match our task
-            if(task.label===node.label){
+            if(task.label===node.label && task.file===node.file){
                 if(typeof(task.group)==='object'){
                     task.group.isDefault=true;    
                 }else{
@@ -354,24 +345,23 @@ end.`;
            
 
         }
-        config.update(
+        
+        await config.update(
             "tasks",
             tasks,
             vscode.ConfigurationTarget.WorkspaceFolder
         );
 
+        vscode.commands.executeCommand('workbench.action.tasks.reloadTasks');
+
         // restart LSP
         client.restart();
     }
-
-
     CodeComplete = async (textEditor: TextEditor, edit: TextEditorEdit) => {
         client.doCodeComplete(textEditor);
       
     }
-
     CodeRename = async (textEditor: TextEditor, edit: TextEditorEdit) => {
-        client.doCodeRename(textEditor);
-      
+        client.doCodeRename(textEditor);    
     }
 }

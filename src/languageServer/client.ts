@@ -447,7 +447,7 @@ export class TLangClient implements ErrorHandler {
     async doCodeComplete(editor: vscode.TextEditor): Promise<void> {
 
         // save
-        await editor.document.save();
+        await vscode.workspace.saveAll();
 
         let sel = editor.selection.start;
         var req: ExecuteCommandParams = {
@@ -483,7 +483,7 @@ export class TLangClient implements ErrorHandler {
     async doCodeRename(editor: vscode.TextEditor): Promise<void> {
 
         // save
-        await editor.document.save();
+        await vscode.workspace.saveAll();
 
         // rename
         await vscode.commands.executeCommand('editor.action.rename');
