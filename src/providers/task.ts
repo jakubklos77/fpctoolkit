@@ -263,6 +263,8 @@ export class FpcTask extends vscode.Task {
 				terminal.args = `${taskDefinition?.file} ${buildOptionString}`.trim().split(' ');
 				if (this._BuildMode == BuildMode.rebuild || forceRebuild) {
 					terminal.args.push('-B');
+
+					this._BuildMode = BuildMode.normal;
 				}
 				return terminal;
 
