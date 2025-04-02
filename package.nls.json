@@ -11,6 +11,7 @@
     "currentproject.cwd": "Get cwd",
     "task.file": "The project file of FPC. (.lpr,.dpr)",
     "task.cwd": "Current path. Use wrokspace root if null.",
+    "task.launchArgs": "Current project launch args for launch.json",
     "task.cleanExt": "file extensions for clean file in unitOutputDir. use * for clear all file. default:(.o,.ppu,.lfm,.a,.or,.res)",
     "task.buildOption.targetOS": "Target OS (-T)",
     "task.buildOption.targetCPU": "Target cpu family (-P)",

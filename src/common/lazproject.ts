@@ -5,6 +5,7 @@ import {
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import * as path from 'path';
+import { taskProvider } from '../providers/task';
 
 const extensionName = "fpctoolkit";
 
@@ -132,12 +133,36 @@ class LazProject {
         this.processFpcOptionStringList(fpcOptions, '-Fu', project.OtherUnitFiles);
         this.processFpcOptionStringList(fpcOptions, '', project.CustomOptions);
     }
+    
+    public async GetProjectArgs(): Promise<string> {
 
-    private async runDefaultBuildTask() {
+        // Fetch the default build task
+        const buildTask = await this.getCurrentProjectTask();
+        
+        if (!buildTask) 
+            return '';
+        
+        const resolvedBuildTask = await buildTask;
+        let task = resolvedBuildTask ? taskProvider.GetTaskDefinition(resolvedBuildTask.name) : null;
+        if (!task)     
+            return '';
+
+        return task.launchArgs ?? '';
+    }
+
+    private async getCurrentProjectTask(): Promise<vscode.Task | null> {
 
         // Fetch the default build task
         const tasks = await vscode.tasks.fetchTasks({ type: 'fpc' });
         const buildTask = tasks.find(task => task.group?.isDefault === true);
+        
+        return buildTask ?? null;
+    }
+
+    private async runDefaultBuildTask() {
+
+        // Fetch the default build task
+        const buildTask = await this.getCurrentProjectTask()
 
         if (!buildTask) 
             return;

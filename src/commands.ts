@@ -29,6 +29,7 @@ export class FpcCommandManager {
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.cwd', this.GetCWD));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.program', this.GetProgram));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.checkforrebuild', this.CheckForRebuild));
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.launchargs', this.GetLaunchArgs));
         
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.complete',this.CodeComplete));
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.rename',this.CodeRename));
@@ -150,6 +151,10 @@ export class FpcCommandManager {
         if (!project)
             return "";
         return project.CWD; 
+    };
+    GetLaunchArgs = async (node?: FpcItem) => {
+
+        return lazproject.GetProjectArgs() ;
     };
     ProjectActivate = async (node?: FpcItem) => {
 

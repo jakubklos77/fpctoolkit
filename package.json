@@ -170,6 +170,10 @@
             "type": "string",
             "description": "%task.file%"
           },
+          "launchArgs": {
+            "type": "string",
+            "description": "%task.launchArgs%"
+          },
           "cwd": {
             "type": "string",
             "description": "%task.cwd%"

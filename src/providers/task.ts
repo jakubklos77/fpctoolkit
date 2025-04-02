@@ -36,6 +36,7 @@ export class FpcTaskDefinition implements vscode.TaskDefinition {
 	[name: string]: any;
 	readonly type: string = 'fpc';
 	file?: string;
+	launchArgs?: string;
 	cwd?: string;
 	cleanExt?: string;
 	inherited?: string;
