@@ -447,7 +447,7 @@ export class TLangClient implements ErrorHandler {
     async doCodeComplete(editor: vscode.TextEditor): Promise<void> {
 
         // save
-        await vscode.workspace.saveAll();
+        await editor.document.save();
 
         let sel = editor.selection.start;
         var req: ExecuteCommandParams = {

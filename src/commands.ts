@@ -93,30 +93,25 @@ export class FpcCommandManager {
 
     };
     ProjectBuildInternal = async (node: FpcItem, rebuild: boolean = false) => {
-        if (node.level === 0) {
-
-        } else {
-            vscode.tasks.fetchTasks({ type: 'fpc' }).then((e) => {
-                e.forEach((task) => {
-                    //vscode.window.showInformationMessage(task.name);
-                    if (task.name === node.label) {
-                        let newtask=taskProvider.taskMap.get(task.name);
-                        if(newtask){
-                            if (!node.forceRebuild && !rebuild) {
-                                (newtask as FpcTask).BuildMode=BuildMode.normal;   
-                            } else {
-                                (newtask as FpcTask).BuildMode=BuildMode.rebuild;   
-                            }
+        vscode.tasks.fetchTasks({ type: 'fpc' }).then((e) => {
+            e.forEach((task) => {
+                //vscode.window.showInformationMessage(task.name);
+                if (task.name === node.label) {
+                    let newtask=taskProvider.taskMap.get(task.name);
+                    if(newtask){
+                        if (!node.forceRebuild && !rebuild) {
+                            (newtask as FpcTask).BuildMode=BuildMode.normal;   
+                        } else {
+                            (newtask as FpcTask).BuildMode=BuildMode.rebuild;   
                         }
-                        vscode.tasks.executeTask(task);
-
-                        return;
                     }
+                    vscode.tasks.executeTask(task);
 
-                });
+                    return;
+                }
+
             });
-
-        }
+        });
 
     };
     ProjectBuild = async (node: FpcItem) => {
