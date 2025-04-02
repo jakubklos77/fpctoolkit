@@ -13,6 +13,7 @@ import { TextEditor, TextEditorEdit } from 'vscode';
 
 
 export class FpcCommandManager {
+
     constructor(private workspaceRoot: string) {
 
     }
@@ -159,53 +160,16 @@ export class FpcCommandManager {
     ProjectActivate = async (node?: FpcItem) => {
 
         // get node file
-        const wrkConfig = vscode.workspace.getConfiguration();
         let file = node?.file;
 
         // if set
         if (file) {
 
-            // update current project
-            await wrkConfig.update('fpctoolkit.currentProject', file, vscode.ConfigurationTarget.Global); 
-
-            // get tasks
-            let matched = false;
-            let config = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(this.workspaceRoot));
-            let tasks=config.tasks;
-            for (const task of tasks) {
-    
-                // match our task
-                if(task.file===file && !matched){
-                    if(typeof(task.group)==='object'){
-                        task.group.isDefault=true;    
-                    }else{
-                        task.group={kind:task.group,isDefault:true};
-                    }
-
-                    matched = true;
-                   
-                // all other tasks - reset    
-                }else{
-                    if(typeof(task.group)==='object'){
-                        task.group.isDefault=undefined;
-                    }
-                }                   
-            }
-
-            // update tasks
-            await config.update(
-                "tasks",
-                tasks,
-                vscode.ConfigurationTarget.WorkspaceFolder
-            );
-    
-            // reload tasks
-            vscode.commands.executeCommand('workbench.action.tasks.reloadTasks');
-
+            await lazproject.ProjectActivate(this.workspaceRoot, file);
+            
             // restart LSP
             client.restart();
         }
-
     };
     TrimFromCursor = async (textEditor: TextEditor, edit: TextEditorEdit) => {
 

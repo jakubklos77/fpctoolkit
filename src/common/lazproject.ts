@@ -7,8 +7,6 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { taskProvider } from '../providers/task';
 
-const extensionName = "fpctoolkit";
-
 export class LazProjectOptions {
 
     IncludeFiles: Array<string> = [];
@@ -133,18 +131,18 @@ class LazProject {
         this.processFpcOptionStringList(fpcOptions, '-Fu', project.OtherUnitFiles);
         this.processFpcOptionStringList(fpcOptions, '', project.CustomOptions);
     }
-    
+
     public async GetProjectArgs(): Promise<string> {
 
         // Fetch the default build task
         const buildTask = await this.getCurrentProjectTask();
-        
-        if (!buildTask) 
+
+        if (!buildTask)
             return '';
-        
+
         const resolvedBuildTask = await buildTask;
         let task = resolvedBuildTask ? taskProvider.GetTaskDefinition(resolvedBuildTask.name) : null;
-        if (!task)     
+        if (!task)
             return '';
 
         return task.launchArgs ?? '';
@@ -155,7 +153,7 @@ class LazProject {
         // Fetch the default build task
         const tasks = await vscode.tasks.fetchTasks({ type: 'fpc' });
         const buildTask = tasks.find(task => task.group?.isDefault === true);
-        
+
         return buildTask ?? null;
     }
 
@@ -164,7 +162,7 @@ class LazProject {
         // Fetch the default build task
         const buildTask = await this.getCurrentProjectTask()
 
-        if (!buildTask) 
+        if (!buildTask)
             return;
 
         // Create a promise to wait for task completion
@@ -240,8 +238,51 @@ class LazProject {
         rebuild = rebuild || this.checkAlteredProjectFilesForRebuild(project.OtherUnitFiles, project.Target);
 
         // rebuild and wait
-        if (rebuild) 
+        if (rebuild)
             await this.runDefaultBuildTask();
+    }
+
+    public async ProjectActivate(workspaceRoot: string, file: string) {
+
+        const wrkConfig = vscode.workspace.getConfiguration();
+
+        // update current project
+        await wrkConfig.update('fpctoolkit.currentProject', file, vscode.ConfigurationTarget.Global);
+
+        // get tasks
+        let matched = false;
+        let config = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(workspaceRoot));
+        let tasks = config.tasks;
+        for (const task of tasks) {
+
+            // match our task
+            if (task.file === file && !matched) {
+                if (typeof (task.group) === 'object') {
+                    task.group.isDefault = true;
+                } else {
+                    task.group = { kind: task.group, isDefault: true };
+                }
+
+                matched = true;
+
+                // all other tasks - reset    
+            } else {
+                if (typeof (task.group) === 'object') {
+                    task.group.isDefault = undefined;
+                }
+            }
+        }
+
+        // update tasks
+        await config.update(
+            "tasks",
+            tasks,
+            vscode.ConfigurationTarget.WorkspaceFolder
+        );
+
+        // reload tasks
+        vscode.commands.executeCommand('workbench.action.tasks.reloadTasks');
+
     }
 }
 
