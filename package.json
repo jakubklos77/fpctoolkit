@@ -489,12 +489,12 @@
           },
           "fpctoolkit.lsp.initializationOptions.includeWorkspaceFoldersAsUnitPaths": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "description": "%lsp.initializationOptions.includeWorkspaceFoldersAsUnitPaths%"
           },
           "fpctoolkit.lsp.initializationOptions.includeWorkspaceFoldersAsIncludePaths": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "description": "%lsp.initializationOptions.includeWorkspaceFoldersAsIncludePaths%"
           },
           "fpctoolkit.lsp.initializationOptions.checkSyntax": {
