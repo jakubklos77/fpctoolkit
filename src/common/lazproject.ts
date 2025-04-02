@@ -61,7 +61,7 @@ class LazProject {
     private processFpcOptionStringList(fpcOptions: Array<string>, option: string, options: Array<string>) {
 
         options.forEach((p) => {
-            fpcOptions.push(option + p);
+            fpcOptions.push('"' + option + p + '"');
         });
     }
 
