@@ -137,7 +137,7 @@ class LazProject {
 
         // Fetch the default build task
         const tasks = await vscode.tasks.fetchTasks({ type: 'fpc' });
-        const buildTask = tasks.find(task => task.group === vscode.TaskGroup.Build);
+        const buildTask = tasks.find(task => task.group?.isDefault === true);
 
         if (!buildTask) 
             return;

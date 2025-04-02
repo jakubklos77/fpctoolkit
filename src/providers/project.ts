@@ -90,7 +90,7 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 		if (element) {
 			this.defaultFtpItem=undefined;
 			let items: FpcItem[] = [];
-			
+			/* currently we do not want any children here
 			element.tasks?.forEach((task) => {
 				let item = new FpcItem(
 					1,
@@ -106,6 +106,7 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 					this.defaultFtpItem = item;
 				}
 			});
+			*/
 			return Promise.resolve(items);
 
 		} else {
@@ -126,7 +127,7 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 							new FpcItem(
 								0,
 								e.label,
-								vscode.TreeItemCollapsibleState.Expanded,
+								vscode.TreeItemCollapsibleState.None,
 								e.file,
 								true,
 								e.group?.isDefault,
