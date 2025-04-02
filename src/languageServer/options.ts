@@ -4,6 +4,7 @@ import *  as fs from 'fs';
 import * as path from 'path';
 import { configuration } from '../common/configuration';
 import { BuildOption, FpcTaskDefinition } from '../providers/task';
+import { lazproject } from '../common/lazproject';
 export class CompileOption {
     /**
      * Compile Option
@@ -223,6 +224,7 @@ export class InitializationOptions {
         this.showSyntaxErrors = cfg.get<boolean>('showSyntaxErrors');
         this.ignoreTextCompletions = cfg.get<boolean>('ignoreTextCompletions');
     }
+
     public updateByCompileOption(opt: CompileOption) {
         this.cwd = opt.cwd;
         this.program = opt.file;
@@ -235,5 +237,7 @@ export class InitializationOptions {
             }
         });
 
+        // handle current project
+        lazproject.HandleCurrentProject(fpcOptions);
     }
 }

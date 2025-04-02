@@ -2,16 +2,16 @@
   "name": "fpctoolkit",
   "displayName": "FreePascal Toolkit",
   "description": "Free pascal compile and build.",
-  "version": "1.1.9",
+  "version": "1.2.0",
   "engines": {
-    "vscode": "^1.44.0"
+    "vscode": "^1.75.0"
   },
   "icon": "images/logo.png",
   "categories": [
     "Programming Languages"
   ],
-  "publisher": "coolchyni",
-  "author": "coolchyni <coolchyni@gmail.com>",
+  "publisher": "jakubklos",
+  "author": "jakubklos <jakubklos77@gmail.com>",
   "license": "MIT",
   "keywords": [
     "free",
@@ -25,10 +25,10 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/coolchyni/fpctoolkit.git"
+    "url": "https://github.com/jakubklos77/fpctoolkit"
   },
   "bugs": {
-    "url": "https://github.com/coolchyni/fpctoolkit/issues"
+    "url": "https://github.com/jakubklos77/fpctoolkit/issues"
   },
   "activationEvents": [
     "onView:FpcProjectExplorer",
@@ -112,6 +112,22 @@
         "title": "%project.newconfig%"
       },
       {
+        "command": "fpctoolkit.currentproject.activate",
+        "title": "%currentproject.activate%"
+      },
+      {
+        "command": "fpctoolkit.currentproject.checkforrebuild",
+        "title": "%currentproject.checkforrebuild%"
+      },
+      {
+        "command": "fpctoolkit.currentproject.program",
+        "title": "%currentproject.program%"
+      },
+      {
+        "command": "fpctoolkit.currentproject.cwd",
+        "title": "%currentproject.cwd%"
+      },
+      {
         "command": "fpctoolkit.project.setdefault",
         "title": "%project.setdefault%"
       }
@@ -131,6 +147,16 @@
         "key": "ctrl+shift+c",
         "command": "fpctoolkit.code.complete",
         "when": "editorTextFocus && !isInEmbeddedEditor"
+      },
+      {
+        "key": "ctrl+t",
+        "command": "fpctoolkit.editor.trimfromcursor",
+        "when": "editorTextFocus && !isInEmbeddedEditor"
+      },
+      {
+        "key": "f2",
+        "command": "fpctoolkit.code.rename",
+        "when": "editorTextFocus"
       }
     ],
     "taskDefinitions": [
@@ -152,9 +178,9 @@
             "type": "string",
             "description": "%task.cleanExt%"
           },
-          "inherited":{
-             "type":"string",
-             "description": "%task.inherited%"
+          "inherited": {
+            "type": "string",
+            "description": "%task.inherited%"
           },
           "windows": {
             "type": "object",
@@ -192,29 +218,29 @@
               }
             }
           },
-          "buildEvent":{
-            "type":"object",
-            "description": "Event to run command." ,
+          "buildEvent": {
+            "type": "object",
+            "description": "Event to run command.",
             "properties": {
-              "before_build":{
-                "type":"array",
+              "before_build": {
+                "type": "array",
                 "description": "Run commands before build.",
                 "items": {
-                  "type":"string"
+                  "type": "string"
                 }
               },
-              "after_build_success":{
-                "type":"array",
+              "after_build_success": {
+                "type": "array",
                 "description": "Run commands after build success.",
                 "items": {
-                  "type":"string"
+                  "type": "string"
                 }
               },
-              "after_build_failure":{
-                "type":"array",
+              "after_build_failure": {
+                "type": "array",
                 "description": "Run commands after build failure.",
                 "items": {
-                  "type":"string"
+                  "type": "string"
                 }
               }
             }
@@ -285,15 +311,15 @@
                   4
                 ]
               },
-              "forceRebuild":{
-                "type":"boolean",
+              "forceRebuild": {
+                "type": "boolean",
                 "description": "%task.buildOption.forceRebuild%",
-                "default":false
+                "default": false
               },
-              "msgIgnore":{
-                "type":"array",
+              "msgIgnore": {
+                "type": "array",
                 "items": {
-                  "type":"number"
+                  "type": "number"
                 },
                 "description": "%task.buildOption.msgIgnore%"
               },
@@ -313,35 +339,19 @@
       "view/item/context": [
         {
           "command": "fpctoolkit.project.build",
-          "when": "view == FpcProjectExplorer && viewItem==fpcbuild",
+          "when": "view == FpcProjectExplorer && viewItem==fpcproject",
           "group": "fpcproject@1"
         },
         {
           "command": "fpctoolkit.project.rebuild",
-          "when": "view == FpcProjectExplorer && viewItem==fpcbuild",
+          "when": "view == FpcProjectExplorer && viewItem==fpcproject",
           "group": "fpcproject@2"
         },
         {
-          "command": "fpctoolkit.project.clean",
-          "when": "view == FpcProjectExplorer && viewItem==fpcbuild",
-          "group": "fpcproject@3"
-        },
-        {
-          "command": "fpctoolkit.project.setdefault",
-          "when": "view == FpcProjectExplorer && viewItem==fpcbuild",
-          "group": "fpcprojectcfg@4"
-        },
-        {
-          "command": "fpctoolkit.project.add",
+          "command": "fpctoolkit.currentproject.activate",
           "when": "view == FpcProjectExplorer && viewItem==fpcproject",
-          "group": "fpcproject@0"
-        },
-        {
-          "command": "fpctoolkit.project.build",
-          "when": "view == FpcProjectExplorer && viewItem==fpcbuild",
-          "group": "inline"
+          "group": "fpcproject@4"
         }
-      
       ]
     },
     "configuration": [
@@ -368,6 +378,10 @@
               "type": "string"
             },
             "description": "%config.customOptions%"
+          },
+          "fpctoolkit.currentProject": {
+            "type": "string",
+            "description": "%config.currentProject%"
           },
           "fpctoolkit.env.PP": {
             "type": "string",
@@ -411,14 +425,13 @@
           },
           "fpctoolkit.format.enabled": {
             "type": "boolean",
-            "default":"true",
+            "default": "true",
             "description": "%config.format.enabled%"
           },
           "fpctoolkit.format.cfgpath": {
             "type": "string",
             "description": "%config.format.cfgpath%"
           }
-
         }
       },
       {
@@ -483,18 +496,18 @@
           "fpctoolkit.lsp.initializationOptions.checkSyntax": {
             "type": "boolean",
             "scope": "application",
-            "default": false,
+            "default": true,
             "description": "%lsp.initializationOptions.checkSyntax%"
           },
           "fpctoolkit.lsp.initializationOptions.publishDiagnostics": {
             "type": "boolean",
             "scope": "application",
-            "default": false,
+            "default": true,
             "description": "%lsp.initializationOptions.publishDiagnostics%"
           },
           "fpctoolkit.lsp.initializationOptions.workspaceSymbols": {
             "type": "boolean",
-            "default": false,
+            "default": true,
             "description": "%lsp.initializationOptions.workspaceSymbols%"
           },
           "fpctoolkit.lsp.initializationOptions.documentSymbols": {
@@ -534,18 +547,17 @@
       {
         "name": "fpc",
         "owner": "external",
+        "fileLocation": [
+          "absolute"
+        ],
         "pattern": [
           {
-            "regexp": "Compiling ([^\\s].*(p|pp|pas|lpr|dpr|inc))$",
-            "file": 1
-          },
-          {
-            "regexp": "^([\\w]+\\.(p|pp|pas|lpr|dpr|inc))\\((\\d+)\\,(\\d+)\\)\\s(Fatal|Error|Warning|Note):(.*)",
+            "regexp": "^([\\w\\/\\.]+\\.(dpr|p|pp|pas))\\((\\d+),(\\d+)\\)\\s((Fatal|Error|Warning|Note):\\s.*)",
+            "file": 1,
             "line": 3,
             "column": 4,
-            "severity": 5,
-            "message": 6,
-            "loop": true
+            "message": 5,
+            "severity": 6
           }
         ]
       }
@@ -567,7 +579,8 @@
     "fs-extra": "9.0.1",
     "tsc": "^2.0.4",
     "vscode-languageclient": "^8.0.1",
-    "vscode-nls": "^3.2.5"
+    "vscode-nls": "^3.2.5",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
@@ -583,5 +596,5 @@
     "rimraf": "^3.0.2",
     "typescript": "^3.9.10"
   },
-  "homepage": "https://github.com/coolchyni/fpctoolkit#readme"
+  "homepage": "https://github.com/jakubklos77/fpctoolkit#readme"
 }

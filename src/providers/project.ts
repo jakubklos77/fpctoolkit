@@ -18,7 +18,7 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 	readonly onDidChangeTreeData: vscode.Event<FpcItem | undefined | void> = this._onDidChangeTreeData.event;
 	private watch!: vscode.FileSystemWatcher;
 	private watchlpr!: vscode.FileSystemWatcher;
-	public defaultFtpItem?: FpcItem = undefined;
+	public defaultFtpItem: FpcItem | undefined = undefined;
 	private config!:vscode.WorkspaceConfiguration;
 	private defaultCompileOption?:CompileOption=undefined;
 	private timeout?:NodeJS.Timeout=undefined;
@@ -106,11 +106,6 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 					this.defaultFtpItem = item;
 				}
 			});
-			if(!this.defaultFtpItem && items.length>0){
-				this.defaultFtpItem=items[0];
-				this.defaultFtpItem.description='default';
-				this.defaultFtpItem.isDefault=true;
-			}
 			return Promise.resolve(items);
 
 		} else {
@@ -130,7 +125,7 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 							e.file,
 							new FpcItem(
 								0,
-								path.basename(e.file),
+								e.label,
 								vscode.TreeItemCollapsibleState.Expanded,
 								e.file,
 								true,
@@ -312,7 +307,8 @@ export class FpcItem extends vscode.TreeItem {
 		public readonly file: string,
 		public fileexist: boolean,
 		public isDefault: boolean,
-		public tasks?: any[]
+		public tasks?: any[],
+		public forceRebuild?: boolean,
 	) {
 		super(label, collapsibleState);
 		if (level === 0) {
@@ -321,7 +317,7 @@ export class FpcItem extends vscode.TreeItem {
 			this.contextValue = 'fpcbuild';
 		}
 		this.tooltip = `${basename(this.label)} `;
-		if (this.level > 0) {
+		if (this.level === 0) {
 			this.description = this.isDefault ? 'default' : '';
 
 			const command = {

@@ -27,8 +27,15 @@
 			"start": "^\\s*\\{\\$REGION(\\s\\'.*\\')?\\}",
 			"end": "^\\s*\\{\\$ENDREGION\\}"
 		}
-	}
-
-    
-
+	},
+    "indentationRules": {
+        "increaseIndentPattern": {
+            "pattern": "^\\s*(begin|repeat|case|private|public|published|protected|var|try|finally)\\b.*$",
+            "flags": "i"
+        },
+        "decreaseIndentPattern": {
+            "pattern": "^\\s*(end)\\b.*$",
+            "flags": "i"
+        }
+    }
 }

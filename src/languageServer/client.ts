@@ -24,7 +24,8 @@ import {
     ErrorHandlerResult,
     ErrorAction,
     CloseHandlerResult,
-    CloseAction} from 'vscode-languageclient/node';
+    CloseAction
+} from 'vscode-languageclient/node';
 
 import { FpcProjectProvider } from '../providers/project';
 import * as util from '../common/util';
@@ -36,9 +37,9 @@ import { ClientRequest } from 'http';
 
 interface InputRegion {
     startLine: number;
-    startCol:number;
+    startCol: number;
     endLine: number;
-    endCol:number;
+    endCol: number;
 }
 
 interface DecorationRangesPair {
@@ -75,7 +76,7 @@ const SetSelectionNotification: NotificationType<SetSelectionParams> = new Notif
 function GetEnvironmentVariables(): {} {
     // load environment variables from settings which are used for CodeTools
     const plat = process.platform;
-    let userEnvironmentVariables = {};
+    let userEnvironmentVariables: { [key: string]: string } = {};
     let keys: string[] = ['PP', 'FPCDIR', 'LAZARUSDIR', 'FPCTARGET', 'FPCTARGETCPU'];
     let settingEnvironmentVariables = workspace.getConfiguration('fpctoolkit.env');
     Object.keys(settingEnvironmentVariables).forEach(key => {
@@ -85,11 +86,17 @@ function GetEnvironmentVariables(): {} {
             }
         }
     });
+
     //set default value
     let PP = settingEnvironmentVariables.get<string>('PP');
-    if (PP === undefined || PP === '') //not init
-    {
-        if (plat === 'win32') {
+    let FPCDIR = settingEnvironmentVariables.get<string>('FPCDIR');
+
+    // windows
+    if (plat === 'win32') {
+
+        if (PP === undefined || PP === '') //not init
+        {
+
             ///3.2.2/bin/i386-win32/fpc.exe
             //search lazarus
             let dirs = ['C:/lazarus/fpc', 'C:/FPC'];
@@ -112,7 +119,13 @@ function GetEnvironmentVariables(): {} {
                     }
                 }
             }
-        } else {
+        }
+
+    // linux
+    } else {
+
+        if (PP === undefined || PP === '') //not init
+        {
             let dirs = ['/usr/bin/fpc', '/usr/local/bin/fpc'];
             let ver_test = new RegExp('\d+\.\d+\.\d+');
             for (const _dir of dirs) {
@@ -120,8 +133,14 @@ function GetEnvironmentVariables(): {} {
                     userEnvironmentVariables['PP'] = _dir;
                 }
             }
-            if (fs.existsSync('/usr/local/share/fpcsrc')) {
-                userEnvironmentVariables['FPCDIR'] = '/usr/local/share/fpcsrc';
+            if (fs.existsSync('/usr/share/fpcsrc/3.2.2')) {
+                userEnvironmentVariables['FPCDIR'] = '/usr/share/fpcsrc/3.2.2';
+            }
+        }
+        if (FPCDIR === undefined || FPCDIR === '') //not init
+        {
+            if (fs.existsSync('/usr/share/fpcsrc/3.2.2')) {
+                userEnvironmentVariables['FPCDIR'] = '/usr/share/fpcsrc/3.2.2';
             }
         }
     }
@@ -134,7 +153,7 @@ function GetEnvironmentVariables(): {} {
 interface myConfiguration extends vscode.WorkspaceConfiguration {
     cwd: string;
 }
-export class TLangClient implements ErrorHandler  {
+export class TLangClient implements ErrorHandler {
     private client: LanguageClient | undefined;
     private targetOS?: string;
     private targetCPU?: string;
@@ -145,30 +164,30 @@ export class TLangClient implements ErrorHandler  {
         this.client = undefined;
     };
 
-      /**
-     * An error has occurred while writing or reading from the connection.
-     *
-     * @param error - the error received
-     * @param message - the message to be delivered to the server if know.
-     * @param count - a count indicating how often an error is received. Will
-     *  be reset if a message got successfully send or received.
-     */
-    error(error: Error, message: Message | undefined, count: number | undefined): ErrorHandlerResult{
-        logger.appendLine(error.name+' '+error.message);
-        return  {action:ErrorAction.Continue} as ErrorHandlerResult;
+    /**
+   * An error has occurred while writing or reading from the connection.
+   *
+   * @param error - the error received
+   * @param message - the message to be delivered to the server if know.
+   * @param count - a count indicating how often an error is received. Will
+   *  be reset if a message got successfully send or received.
+   */
+    error(error: Error, message: Message | undefined, count: number | undefined): ErrorHandlerResult {
+        logger.appendLine(error.name + ' ' + error.message);
+        return { action: ErrorAction.Continue } as ErrorHandlerResult;
     }
     /**
     * The connection to the server got closed.
     */
-    closed(): CloseHandlerResult{
+    closed(): CloseHandlerResult {
         logger.appendLine("Server closed.");
-        return  {action:CloseAction.Restart} as CloseHandlerResult;
+        return { action: CloseAction.Restart } as CloseHandlerResult;
     }
 
     private getLanguageServerFileName(): string {
         let extensionProcessName: string = 'pasls';
-        let paslspath=vscode.workspace.getConfiguration('fpctoolkit.pasls').get<string>('path');
-      
+        let paslspath = vscode.workspace.getConfiguration('fpctoolkit.pasls').get<string>('path');
+
 
         const plat: NodeJS.Platform = process.platform;
         const arch = process.arch;
@@ -205,7 +224,7 @@ export class TLangClient implements ErrorHandler  {
         } else {
             throw "Invalid arch";
         }
-        if(paslspath && paslspath.length>0){
+        if (paslspath && paslspath.length > 0) {
             return paslspath;
         }
         return path.resolve(util.getExtensionFilePath("bin"), extensionProcessName);
@@ -229,10 +248,10 @@ export class TLangClient implements ErrorHandler  {
 
                         let position: vscode.Position = new vscode.Position(Number.parseInt(pos[0]), Number.parseInt(pos[1]));
 
-                        let diag=new vscode.Diagnostic(new vscode.Range(position,position),e.message);
-                    
-                        this.client?.diagnostics?.set( vscode.Uri.parse(file),[diag]);
-                    
+                        let diag = new vscode.Diagnostic(new vscode.Range(position, position), e.message);
+
+                        this.client?.diagnostics?.set(vscode.Uri.parse(file), [diag]);
+
 
                         vscode.window.showErrorMessage(e.message, 'View Error').then(item => {
                             if (item === 'View Error') {
@@ -280,7 +299,7 @@ export class TLangClient implements ErrorHandler  {
                 // We must convert to vscode.Ranges in order to make use of the API's
                 const ranges: vscode.Range[] = [];
                 params.regions.forEach(element => {
-                    const newRange: vscode.Range = new vscode.Range(element.startLine-1, element.startCol-1, element.endLine-1, element.endCol-1);
+                    const newRange: vscode.Range = new vscode.Range(element.startLine - 1, element.startCol - 1, element.endLine - 1, element.endCol - 1);
                     ranges.push(newRange);
                 });
                 // Find entry for cached file and act accordingly
@@ -310,10 +329,10 @@ export class TLangClient implements ErrorHandler  {
         });
 
         this.client?.onNotification(SetSelectionNotification, (params: SetSelectionParams) => {
-            let uri=vscode.Uri.parse(params.uri);
+            let uri = vscode.Uri.parse(params.uri);
             vscode.workspace.openTextDocument(uri).then(doc => {
                 setTimeout(() => {
-                    vscode.window.showTextDocument(doc,  { selection: new vscode.Selection(params.anchor, params.active) });
+                    vscode.window.showTextDocument(doc, { selection: new vscode.Selection(params.anchor, params.active) });
                 }, 500);
             });
         });
@@ -327,8 +346,8 @@ export class TLangClient implements ErrorHandler  {
         // Load the path to the language server from settings
         //let executable: string = workspace.getConfiguration('pascalLanguageServer').get("executable")!;
         let executable: string = this.getLanguageServerFileName();
-        if(process.platform!='win32'){
-            fs.chmod(executable,755);
+        if (process.platform != 'win32') {
+            fs.chmod(executable, 755);
         }
         // TODO: download the executable for the active platform
         // https://github.com/genericptr/pascal-language-server/releases/download/x86_64-darwin/pasls
@@ -396,7 +415,7 @@ export class TLangClient implements ErrorHandler  {
         }
 
         this.client = new LanguageClient('fpctoolkit.lsp', 'Free Pascal Language Server', serverOptions, clientOptions);
-        
+
     };
     public onDidChangeVisibleTextEditor(editor: vscode.TextEditor): void {
 
@@ -425,55 +444,65 @@ export class TLangClient implements ErrorHandler  {
 
     };
 
-    async doCodeComplete(editor:vscode.TextEditor): Promise<void> {
-        let sel=editor.selection.start;
-        var req:ExecuteCommandParams={
-            command:"CompleteCode",
-            arguments:[
+    async doCodeComplete(editor: vscode.TextEditor): Promise<void> {
+
+        // save
+        await editor.document.save();
+
+        let sel = editor.selection.start;
+        var req: ExecuteCommandParams = {
+            command: "CompleteCode",
+            arguments: [
                 editor.document.uri.toString(),
                 sel.line.toString(),
                 sel.character.toString()
             ]
         };
-        let result:ExecuteCommandParams=await this.client?.sendRequest(ExecuteCommandRequest.type,req);
+        let result: ExecuteCommandParams = await this.client?.sendRequest(ExecuteCommandRequest.type, req);
 
-        if(result.arguments![0]=='true'){
+        if (result.arguments![0] == 'true') {
 
-            let newLine=Number.parseInt( result.arguments![3] );
-            let newCharacter=Number.parseInt(result.arguments![2]);
+            let newLine = Number.parseInt(result.arguments![3]);
+            let newCharacter = Number.parseInt(result.arguments![2]);
             // let newTopLine=Number.parseInt(result.arguments![3]);
-            
-            let blocktop=Number.parseInt(result.arguments![4]);
-            if(blocktop==0)
-            {
-                return ;
+
+            let blocktop = Number.parseInt(result.arguments![4]);
+            if (blocktop == 0) {
+                return;
             }
             // let blockContent=result.arguments![5];
 
-            let pos=new vscode.Position(newLine,newCharacter);
+            let pos = new vscode.Position(newLine, newCharacter);
             setTimeout(() => {
-                vscode.window.showTextDocument(editor.document,  { selection: new vscode.Selection(pos,pos) });
+                vscode.window.showTextDocument(editor.document, { selection: new vscode.Selection(pos, pos) });
             }, 200);
-            
-        }
-       
 
+        }
     }
 
-    async getUnitPath( unitnames:string[]): Promise<string[]> {
+    async doCodeRename(editor: vscode.TextEditor): Promise<void> {
 
-        var req:ExecuteCommandParams={
-            command:"GetUnitPath",
-            arguments:unitnames
+        // save
+        await vscode.workspace.saveAll();
+
+        // rename
+        await vscode.commands.executeCommand('editor.action.rename');
+    }
+
+    async getUnitPath(unitnames: string[]): Promise<string[]> {
+
+        var req: ExecuteCommandParams = {
+            command: "GetUnitPath",
+            arguments: unitnames
         };
-        let result:ExecuteCommandParams=await this.client?.sendRequest(ExecuteCommandRequest.type,req);
+        let result: ExecuteCommandParams = await this.client?.sendRequest(ExecuteCommandRequest.type, req);
 
 
-        if(result.arguments){
+        if (result.arguments) {
             return result.arguments;
-        }else{
+        } else {
             return [];
         }
-        
+
     }
 }

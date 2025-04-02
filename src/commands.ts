@@ -6,6 +6,7 @@ import path = require('path');
 import { BuildMode, FpcTask, FpcTaskDefinition, FpcTaskProvider, taskProvider } from './providers/task';
 import { CompileOption } from './languageServer/options';
 import { configuration } from './common/configuration'
+import { lazproject } from './common/lazproject'
 import { type } from 'os';
 import { client } from './extension';
 import { TextEditor, TextEditorEdit } from 'vscode';
@@ -18,13 +19,20 @@ export class FpcCommandManager {
     registerAll(context: vscode.ExtensionContext) {
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.build', this.ProjectBuild));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.rebuild', this.ProjectReBuild));
-        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.clean', this.projectClean));
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.clean', this.ProjectClean));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.opensetting', this.ProjectOpen));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.newproject', this.ProjectNew));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.add', this.ProjectAdd));
-        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.setdefault', this.projectSetDefault));
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.setdefault', this.ProjectSetDefault));
+        
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.activate', this.ProjectActivate));        
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.cwd', this.GetCWD));
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.program', this.GetProgram));
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.checkforrebuild', this.CheckForRebuild));
         
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.complete',this.CodeComplete));
+        context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.rename',this.CodeRename));
+        context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.trimfromcursor',this.TrimFromCursor));
     }
     ProjectAdd = async (node: FpcItem) => {
         if (node.level === 0) {
@@ -84,58 +92,37 @@ export class FpcCommandManager {
         }
 
     };
-    ProjectBuild = async (node: FpcItem) => {
-        if (node.level === 0) {
-
-        } else {
-            vscode.tasks.fetchTasks({ type: 'fpc' }).then((e) => {
-                e.forEach((task) => {
-                    //vscode.window.showInformationMessage(task.name);
-                    if (task.name === node.label) {
-                        let newtask=taskProvider.taskMap.get(task.name);
-                        if(newtask){
+    ProjectBuildInternal = async (node: FpcItem, rebuild: boolean = false) => {
+        vscode.tasks.fetchTasks({ type: 'fpc' }).then((e) => {
+            e.forEach((task) => {
+                //vscode.window.showInformationMessage(task.name);
+                if (task.name === node.label) {
+                    let newtask=taskProvider.taskMap.get(task.name);
+                    if(newtask){
+                        if (!node.forceRebuild && !rebuild) {
                             (newtask as FpcTask).BuildMode=BuildMode.normal;   
+                        } else {
+                            (newtask as FpcTask).BuildMode=BuildMode.rebuild;   
                         }
-                        vscode.tasks.executeTask(task);
-
-                        return;
                     }
+                    vscode.tasks.executeTask(task);
 
-                });
+                    return;
+                }
+
             });
-
-        }
+        });
 
     };
+    ProjectBuild = async (node: FpcItem) => {
 
+        this.ProjectBuildInternal(node);
+
+    };
     ProjectReBuild = async (node: FpcItem) => {
 
-        if (node.level === 0) {
-
-        } else {
-            await this.projectClean(node);
-            this.ProjectBuild(node);
-
-            // vscode.tasks.fetchTasks({ type: 'fpc' }).then((e) => {
-
-            //     for (const task of e) {
-            //         if (task.name === node.label) {
-            //             let newtask=taskProvider.taskMap.get(task.name);
-            //             if(newtask){
-            //                 (newtask as FpcTask).BuildMode=BuildMode.rebuild;   
-            //             }
-                        
-            //             vscode.tasks.executeTask(task).then((e)=>{
-            //                 console.log(e.task.name);
-            //             });
-
-            //             return;
-            //         }
-   
-            //     }
-            // });
-
-        }
+        await this.ProjectClean(node);
+        this.ProjectBuildInternal(node, true);
 
     };
     ProjectOpen = async (node?: FpcItem) => {
@@ -144,6 +131,99 @@ export class FpcCommandManager {
         let doc = await vscode.workspace.openTextDocument(file);
         let te = await vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
 
+    };
+    CheckForRebuild = async (node?: FpcItem) => {
+
+        await lazproject.CheckBeforeBuild();
+        return ""; 
+    };
+    GetProgram = async (node?: FpcItem) => {
+
+        let project = lazproject.LoadCurrentProjectOptions();
+        if (!project)
+            return "";
+        return project.Target; 
+    };
+    GetCWD = async (node?: FpcItem) => {
+
+        let project = lazproject.LoadCurrentProjectOptions();
+        if (!project)
+            return "";
+        return project.CWD; 
+    };
+    ProjectActivate = async (node?: FpcItem) => {
+
+        // get node file
+        const wrkConfig = vscode.workspace.getConfiguration();
+        let file = node?.file;
+
+        // if set
+        if (file) {
+
+            // update current project
+            await wrkConfig.update('fpctoolkit.currentProject', file, vscode.ConfigurationTarget.Global); 
+
+            // get tasks
+            let matched = false;
+            let config = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(this.workspaceRoot));
+            let tasks=config.tasks;
+            for (const task of tasks) {
+    
+                // match our task
+                if(task.file===file && !matched){
+                    if(typeof(task.group)==='object'){
+                        task.group.isDefault=true;    
+                    }else{
+                        task.group={kind:task.group,isDefault:true};
+                    }
+
+                    matched = true;
+                   
+                // all other tasks - reset    
+                }else{
+                    if(typeof(task.group)==='object'){
+                        task.group.isDefault=undefined;
+                    }
+                }                   
+            }
+
+            // update tasks
+            await config.update(
+                "tasks",
+                tasks,
+                vscode.ConfigurationTarget.WorkspaceFolder
+            );
+    
+            // reload tasks
+            vscode.commands.executeCommand('workbench.action.tasks.reloadTasks');
+
+            // restart LSP
+            client.restart();
+        }
+
+    };
+    TrimFromCursor = async (textEditor: TextEditor, edit: TextEditorEdit) => {
+
+        const editor = vscode.window.activeTextEditor;
+
+        if (editor) {
+            const cursorPosition = editor.selection.active; // Get current cursor position
+
+            // Get the full text from the cursor to the end of the document
+            const documentText = editor.document.getText();
+            const textAfterCursor = documentText.slice(editor.document.offsetAt(cursorPosition));
+
+            // Regular expression to match leading spaces, blank lines, and trim them
+            const trimmedText = textAfterCursor.replace(/^\s*\n*/, '');  // Remove leading blank lines and spaces
+
+            // Get the range from the cursor to the end of the document
+            const range = new vscode.Range(cursorPosition, editor.document.positionAt(documentText.length));
+
+            // Perform the text replacement with the trimmed text
+            await editor.edit(editBuilder => {
+                editBuilder.replace(range, trimmedText);
+            });
+        }        
     };
     ProjectNew = async () => {
 
@@ -202,7 +282,7 @@ end.`;
         );
 
     };
-    projectClean = async (node: FpcItem) => {
+    ProjectClean = async (node: FpcItem) => {
 
         let definition = taskProvider.GetTaskDefinition(node.label);
 
@@ -255,18 +335,20 @@ end.`;
             }
         }
     };
-
-    projectSetDefault = async (node: FpcItem) => {
+    ProjectSetDefault = async (node: FpcItem) => {
         let config = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(this.workspaceRoot));
         let tasks=config.tasks;
         for (const task of tasks) {
-            if(task.label===node.label){
+
+            // match our task
+            if(task.label===node.label && task.file===node.file){
                 if(typeof(task.group)==='object'){
                     task.group.isDefault=true;    
                 }else{
                     task.group={kind:task.group,isDefault:true};
                 }
-                client.restart();
+               
+            // all other tasks - reset    
             }else{
                 if(typeof(task.group)==='object'){
                     task.group.isDefault=undefined;
@@ -275,16 +357,23 @@ end.`;
            
 
         }
-        config.update(
+        
+        await config.update(
             "tasks",
             tasks,
             vscode.ConfigurationTarget.WorkspaceFolder
         );
+
+        vscode.commands.executeCommand('workbench.action.tasks.reloadTasks');
+
+        // restart LSP
+        client.restart();
     }
-
-
-    CodeComplete= async (textEditor: TextEditor, edit: TextEditorEdit) => {
+    CodeComplete = async (textEditor: TextEditor, edit: TextEditorEdit) => {
         client.doCodeComplete(textEditor);
       
+    }
+    CodeRename = async (textEditor: TextEditor, edit: TextEditorEdit) => {
+        client.doCodeRename(textEditor);    
     }
 }

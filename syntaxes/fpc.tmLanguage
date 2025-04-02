@@ -21,9 +21,27 @@
 	<array>
 		<dict>
 			<key>match</key>
-			<string>\b(?i:(absolute|abstract|all|and|and_then|array|as|asm|assembler|attribute|begin|bindable|case|class|const|constructor|destructor|delay|div|do|downto|else|end|except|export|exports|external|far|file|finalization|finally|for|forward|generic|goto|if|inc|implementation|import|in|index|inherited|initialization|inline|interface|interrupt|is|label|library|mod|module|near|nil|not|object|of|only|operator|or|or_else|otherwise|out|override|overload|packed|pow|private|property|protected|public|published|qualified|record|repeat|resident|restricted|segment|set|shl|shr|then|to|try|type|unit|until|uses|value|var|view|virtual|while|with|xor|write|writeln|specialize))\b</string>
+			<string>\b(?i:(absolute|abstract|static|all|and|and_then|array|as|asm|assembler|attribute|begin|bindable|case|class|const|constructor|destructor|delay|div|do|downto|else|end|except|export|exports|external|far|file|finalization|finally|for|forward|generic|goto|if|inc|implementation|import|in|index|inherited|initialization|inline|interface|interrupt|is|label|library|mod|module|near|nil|not|object|of|only|operator|or|or_else|otherwise|out|override|overload|packed|pow|private|property|protected|public|published|qualified|record|repeat|resident|restricted|segment|set|shl|shr|then|to|try|type|unit|until|uses|value|var|threadvar|view|virtual|while|with|xor|write|read|writeln|readln|specialize|raise|exit|break|continue|on|reference))\b</string>
 			<key>name</key>
 			<string>keyword.control.pascal</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>%[01]+\b</string>
+			<key>name</key>
+			<string>constant.numeric.pascal</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>\$[0-9a-fA-F]+\b</string>
+			<key>name</key>
+			<string>constant.numeric.pascal</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>&amp;[0-7]+\b</string>
+			<key>name</key>
+			<string>constant.numeric.pascal</string>
 		</dict>
 		<dict>
 			<key>captures</key>
@@ -44,7 +62,19 @@
 			<key>name</key>
 			<string>meta.function.prototype.pascal</string>
 		</dict>
-
+		<dict>
+			<key>begin</key>
+			<string>\[</string>
+			<key>end</key>
+			<string>\]</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>source.pascal</string>
+				</dict>
+			</array>
+		</dict>
 		<dict>
 			<key>captures</key>
 			<dict>
@@ -66,45 +96,250 @@
 		</dict>
 		<!-- prueba-->
 		<dict>
-			<key>captures</key>
+			<key>match</key>
+			<string>\b(Abs|Sqr|Sin|Cos|Exp|Ln|Sqrt|Round|Trunc|Length|SetLength|Copy|Concat|Pos|Insert|Delete|Trim|UpperCase|LowerCase|IntToStr|StrToInt|FloatToStr|StrToFloat|BoolToStr|StrToBool|Now|Date|Time|EncodeDate|EncodeTime|DecodeDate|DecodeTime|AssignFile|Reset|Rewrite|CloseFile|Read|Write|Eof|New|Dispose|GetMem|FreeMem|Random|Inc|Dec|Ord|Chr|SizeOf)\b</string>
+			<key>name</key>
+			<string>keyword.other.special-method.pascal</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>\b(?i:(Shortint|Integer|Int8|UInt8|Int16|UInt16|Int32|UInt32|Int64|UInt64|UnicodeString|UnicodeChar|UTF8String|AnsiString|Longint|Byte|Word|Boolean|WordBool|LongBool|ByteBool|Real|Single|Double|Extended|Comp|String|Char|RawByteString|Pointer|Exception|DateTimeString|UuidString|EnumString|Ipv4String|Ipv6String))\b</string>
+			<key>name</key>
+			<string>entity.name.type.pascal</string>
+		</dict>
+		<!--<dict>
+			<key>match</key>
+			<string>(?&lt;=:\s*)T[A-Z]\w+</string>
+			<key>name</key>
+			<string>entity.name.type.pascal</string>
+		</dict>-->
+		<dict>
+			<key>begin</key>
+			<string>(\w+)(&lt;)</string>
+			<key>end</key>
+			<string>&gt;</string>
+			<key>beginCaptures</key>
 			<dict>
 				<key>1</key>
 				<dict>
 					<key>name</key>
-					<string>storage.type.function.pascal</string>
+					<string>entity.name.type.pascal</string>
 				</dict>
 				<key>2</key>
 				<dict>
 					<key>name</key>
-					<string>entity.name.function.pascal</string>
+					<string>punctuation.pascal</string>
 				</dict>
 			</dict>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.pascal</string>
+				</dict>
+			</dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>source.pascal</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
 			<key>match</key>
-			<string>\b(?i:(Shortint|Integer|Longint|Byte|Word|Boolean|WordBool|LongBool|ByteBool|Real|Single|Double|Extended|Comp|String|Char|Length|Upcase|textbackground|textcolor|gotoxy|crt|clrscr|readkey|read|readln))\b</string>
+			<string>\b[TPE][A-Z]\w+</string>
 			<key>name</key>
-			<string>meta.function.pascal</string>
+			<string>entity.name.type.pascal</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>\b[A-Z_]{3,}\b</string>
+			<key>name</key>
+			<string>constant.other.pascal</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>\bFalse|True\b</string>
+			<key>name</key>
+			<string>constant.language.boolean.pascal</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>\b(?i:(Authenticate|RequireFormData|RequireIntegerParameter|RequireIdParameter|RequireCurrencyParameter|RequireStringParameter|RequireBooleanParameter|TryGetStringParameter|TryGetIntegerParameter|TryGetIdParameter|TryGetCurrencyParameter|TryGetBooleanParameter|TryGetDoubleParameter|TryGetIpv4Parameter|RequireDoubleParameter|RequireIpv4Parameter|TryGetFormDataStringParameter|TryGetFormDataIntegerParameter|TryGetFormDataBooleanParameter|TryGetFormDataDoubleParameter|TryGetFormDataCurrencyParameter|TryGetFormDataIpv4Parameter|RequireFormDataStringParameter|RequireFormDataIntegerParameter|RequireFormDataBooleanParameter|RequireFormDataCurrencyParameter|RequireFormDataDoubleParameter|RequireFormDataIpv4Parameter|GetFormDataStringParameterDefault|GetFormDataIntegerParameterDefault|GetFormDataBooleanParameterDefault|GetFormDataCurrencyParameterDefault|GetFormDataDoubleParameterDefault|GetFormDataIpv4ParameterDefault|RequirePermission|RequireParameterCondition|GetIntegerParameterDefault|GetStringParameterDefault|GetBooleanParameterDefault|GetCurrencyParameterDefault|GetDoubleParameterDefault|GetIdParameterDefault))\b</string>
+			<key>name</key>
+			<string>support.function.pascal</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>\b(?i:(UserId|Permissions|NetworkContext|WebContext|RequestHeaders|Reroute|RerouteMethod|RerouteTo|RerouteIgnoreGateways|RerouteIgnoreGatewaysDepth|RerouteCaller|RerouteCallerMethod|RerouteIgnoreRoutingErrors|ReroutesLeft|ReroutesDontHeapify|IsGatewayCall|GatewayPrefix|GatewayFollow|ResponseStream|ResponseCookies|AssociatedData|FormData|ResponseHeaders|ChunkedTransfer|ResponseCode|ResponseComment))\b</string>
+			<key>name</key>
+			<string>variable.other.special.pascal</string>
+		</dict>
+		<dict>
+			<key>match</match>
+			<string>\bResult\b</string>
+			<key>name</key>
+			<string>variable.other.result.pascal</string>
 		</dict>
 		<!-- prueba-->
 
 		<dict>
 			<key>match</key>
-			<string>\b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\.?[0-9]*)|(\.[0-9]+))((e|E)(\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f|ll|LL|ull|ULL)?\b</string>
+			<string>\b((([0-9]+\.?[0-9]*)|(\.[0-9]+))((e|E)(\+|-)?[0-9]+)?)\b</string>
 			<key>name</key>
 			<string>constant.numeric.pascal</string>
 		</dict>
 		<dict>
-			<key>captures</key>
+			<key>begin</key>
+			<string>\.(?:ExecuteCounted|ExecuteNonQuery|ExecuteQuery|ExecuteDirect|ExecuteRow|ReadLocals|ReadRecords|ReadToObject|ReadRecord)(?:&lt;(.*?)&gt;)?\(</string>
+			<key>beginCaptures</key>
 			<dict>
 				<key>1</key>
 				<dict>
-					<key>name</key>
-					<string>punctuation.definition.comment.pascal</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.pascal</string>
+						</dict>
+					</array>
 				</dict>
 			</dict>
-			<key>match</key>
-			<string>(--).*$\n?</string>
-			<key>name</key>
-			<string>comment.line.double-dash.pascal.one</string>
+			<key>end</key>
+			<string>\)</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>begin</key>
+					<string>\[</string>
+					<key>end</key>
+					<string>\]</string>
+					
+					<key>beginCaptures</key>
+					<dict>
+						<key>0</key>
+						<dict>
+							<key>include</key>
+							<string>source.pascal</string>
+						</dict>
+					</dict>
+
+					<key>endCaptures</key>
+					<dict>
+						<key>0</key>
+						<dict>
+							<key>include</key>
+							<string>source.pascal</string>
+						</dict>
+					</dict>
+
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.pascal</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>'</string>
+					<key>end</key>
+					<string>'</string>
+
+					<key>beginCaptures</key>
+					<dict>
+						<key>0</key>
+						<dict>
+							<key>name</key>
+							<string>string.pascal</string>
+						</dict>
+					</dict>
+					<key>endCaptures</key>
+					<dict>
+						<key>0</key>
+						<dict>
+							<key>name</key>
+							<string>string.pascal</string>
+						</dict>
+					</dict>
+
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>match</key>
+							<string>\breturning\b</string>
+							<key>name</key>
+							<string>keyword.sql</string>
+						</dict>
+						<dict>
+							<key>match</key>
+							<string>%[dsfC]</string>
+							<key>name</key>
+							<string>constant.character.escape.sql</string>
+						</dict>
+						<dict>
+							<key>include</key>
+							<string>source.sql</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>&lt;&lt;&lt;</string>
+					<key>end</key>
+					<string>&gt;&gt;&gt;</string>
+
+					<key>beginCaptures</key>
+					<dict>
+						<key>0</key>
+						<dict>
+							<key>name</key>
+							<string>string.pascal</string>
+						</dict>
+					</dict>
+					<key>endCaptures</key>
+					<dict>
+						<key>0</key>
+						<dict>
+							<key>name</key>
+							<string>string.pascal</string>
+						</dict>
+					</dict>
+
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>match</key>
+							<string>\breturning\b</string>
+							<key>name</key>
+							<string>keyword.sql</string>
+						</dict>
+						<dict>
+							<key>match</key>
+							<string>%[dsfC]</string>
+							<key>name</key>
+							<string>constant.character.escape.sql</string>
+						</dict>
+						<dict>
+							<key>match</key>
+							<string>^\s*\*</string>
+							<key>name</key>
+							<string>string.pascal</string>
+						</dict>
+						<dict>
+							<key>include</key>
+							<string>source.sql</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>source.pascal</string>
+				</dict>
+			</array>
 		</dict>
 		<dict>
 			<key>captures</key>
@@ -120,6 +355,20 @@
 			<key>name</key>
 			<string>comment.line.double-slash.pascal.two</string>
 		</dict>
+		<!-- <dict>
+			<key>captures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.comment.pascal</string>
+				</dict>
+			</dict>
+			<key>match</key>
+			<string>(- -).*$\n?</string>
+			<key>name</key>
+			<string>comment.line.double-dash.pascal.one</string>
+		</dict> -->
 		<dict>
 			<key>begin</key>
 			<string>\(\*</string>

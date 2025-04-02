@@ -1,10 +1,14 @@
 {
-    "project.build": "Build",
-    "project.rebuild": "Clean up and build",
+    "project.build": "Compile",
+    "project.rebuild": "Rebuild",
     "project.clear": "Clean up",
     "project.open": "Open",
     "project.newconfig": "New Build Config",
-    "project.setdefault": "Set As Default",
+    "project.setdefault": "Set as default",
+    "currentproject.activate": "Activate project",
+    "currentproject.checkforrebuild": "Check for rebuild",
+    "currentproject.program": "Get program",
+    "currentproject.cwd": "Get cwd",
     "task.file": "The project file of FPC. (.lpr,.dpr)",
     "task.cwd": "Current path. Use wrokspace root if null.",
     "task.cleanExt": "file extensions for clean file in unitOutputDir. use * for clear all file. default:(.o,.ppu,.lfm,.a,.or,.res)",
@@ -51,6 +55,7 @@
 
     "config.format.tabsize": "Table space size.",
     "config.format.enabled": "Enable jedi formatter.",
-    "config.format.cfgpath": "The path of jcfsettings.cfg."
+    "config.format.cfgpath": "The path of jcfsettings.cfg.",
+    "config.currentProject": "Current project name."
 
 }
