@@ -143,6 +143,7 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 			let items: FpcItem[] = [];
 
 
+			/*
 			vscode.workspace.workspaceFolders!.forEach(item => {
 				let files = fs.readdirSync(item.uri.fsPath);
 				for (let index = 0; index < files.length; index++) {
@@ -177,6 +178,7 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 					}
 				}
 			});
+			*/
 
 			for (const e of itemMaps.values()) {
 				items.push(e);
