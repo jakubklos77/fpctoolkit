@@ -141,14 +141,14 @@ export class FpcCommandManager {
     };
     GetProgram = async (node?: FpcItem) => {
 
-        let project = lazproject.LoadCurrentProjectOptions();
+        let project = await lazproject.LoadCurrentProjectOptions();
         if (!project)
             return "";
         return project.Target; 
     };
     GetCWD = async (node?: FpcItem) => {
 
-        let project = lazproject.LoadCurrentProjectOptions();
+        let project = await lazproject.LoadCurrentProjectOptions();
         if (!project)
             return "";
         return project.CWD; 

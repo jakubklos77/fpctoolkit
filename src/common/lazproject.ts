@@ -5,7 +5,7 @@ import {
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { taskProvider } from '../providers/task';
+import { FpcTaskDefinition, taskProvider } from '../providers/task';
 
 export class LazProjectOptions {
 
@@ -64,14 +64,15 @@ class LazProject {
         });
     }
 
-    public LoadCurrentProjectOptions(): LazProjectOptions | null {
+    public async LoadCurrentProjectOptions(): Promise<LazProjectOptions | null> {
 
         let lazProjectResult: LazProjectOptions | null = null;
 
         // get project
-        let project = vscode.workspace.getConfiguration().get<string>('fpctoolkit.currentProject');
-        if (project) {
+        let task = await this.getDefaultProjectTaskDefinition();
+        if (task && task.file) {
             // check if relative path
+            let project = task.file;
             if (!project.startsWith("/")) {
                 // expand
                 project = path.join(vscode.workspace.workspaceFolders![0].uri.fsPath, project);
@@ -116,10 +117,10 @@ class LazProject {
         return lazProjectResult;
     }
 
-    public HandleCurrentProject(fpcOptions: Array<string>) {
+    public async HandleCurrentProject(fpcOptions: Array<string>) {
 
         // load
-        let project = this.LoadCurrentProjectOptions();
+        let project = await this.LoadCurrentProjectOptions();
         if (!project)
             return;
 
@@ -132,23 +133,30 @@ class LazProject {
         this.processFpcOptionStringList(fpcOptions, '', project.CustomOptions);
     }
 
-    public async GetProjectArgs(): Promise<string> {
+    public async getDefaultProjectTaskDefinition(): Promise<FpcTaskDefinition | null> {
 
         // Fetch the default build task
-        const buildTask = await this.getCurrentProjectTask();
+        const currentTask = await this.getDefaultProjectTask();
+        if (!currentTask)
+            return null;
 
-        if (!buildTask)
-            return '';
+        let task = currentTask ? taskProvider.GetTaskDefinition(currentTask.name) : null;
+        if (!task)
+            return null;
 
-        const resolvedBuildTask = await buildTask;
-        let task = resolvedBuildTask ? taskProvider.GetTaskDefinition(resolvedBuildTask.name) : null;
+        return task;
+    }
+
+    public async GetProjectArgs(): Promise<string> {
+
+        let task = await this.getDefaultProjectTaskDefinition();        
         if (!task)
             return '';
 
         return task.launchArgs ?? '';
     }
 
-    private async getCurrentProjectTask(): Promise<vscode.Task | null> {
+    private async getDefaultProjectTask(): Promise<vscode.Task | null> {
 
         // Fetch the default build task
         const tasks = await vscode.tasks.fetchTasks({ type: 'fpc' });
@@ -160,7 +168,7 @@ class LazProject {
     private async runDefaultBuildTask() {
 
         // Fetch the default build task
-        const buildTask = await this.getCurrentProjectTask()
+        const buildTask = await this.getDefaultProjectTask()
 
         if (!buildTask)
             return;
@@ -229,7 +237,7 @@ class LazProject {
     public async CheckBeforeBuild() {
 
         // load 
-        let project = this.LoadCurrentProjectOptions();
+        let project = await this.LoadCurrentProjectOptions();
         if (!project)
             return;
 
@@ -243,11 +251,6 @@ class LazProject {
     }
 
     public async ProjectActivate(workspaceRoot: string, file: string) {
-
-        const wrkConfig = vscode.workspace.getConfiguration();
-
-        // update current project
-        await wrkConfig.update('fpctoolkit.currentProject', file, vscode.ConfigurationTarget.Global);
 
         // get tasks
         let matched = false;

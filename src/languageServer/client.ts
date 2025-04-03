@@ -396,7 +396,7 @@ export class TLangClient implements ErrorHandler {
 
         let opt = await this.projProvider.GetDefaultTaskOption();
         if (opt != undefined) {
-            initializationOptions.updateByCompileOption(opt);
+            await initializationOptions.updateByCompileOption(opt);
         } else {
             opt = new CompileOption();
             opt.buildOption!.targetCPU = this.targetCPU;

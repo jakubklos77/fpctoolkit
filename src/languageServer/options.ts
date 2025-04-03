@@ -225,7 +225,7 @@ export class InitializationOptions {
         this.ignoreTextCompletions = cfg.get<boolean>('ignoreTextCompletions');
     }
 
-    public updateByCompileOption(opt: CompileOption) {
+    public async updateByCompileOption(opt: CompileOption) {
         this.cwd = opt.cwd;
         this.program = opt.file;
         let fpcOptions: Array<string> = this.fpcOptions;
@@ -238,6 +238,6 @@ export class InitializationOptions {
         });
 
         // handle current project
-        lazproject.HandleCurrentProject(fpcOptions);
+        await lazproject.HandleCurrentProject(fpcOptions);
     }
 }
