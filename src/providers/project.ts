@@ -70,14 +70,14 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 			return;
 		}
 
-		//default task setting changed 
+		//default task setting changed
 		let newCompileOption=await this.GetDefaultTaskOption();
 		if(oldCompileOption.toOptionString()!=newCompileOption.toOptionString()){
 			taskProvider.refresh();
 		}
 		this.refresh();
 
-		
+
 
 	}
 	getTreeItem(element: FpcItem): vscode.TreeItem {
@@ -110,7 +110,7 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 			return Promise.resolve(items);
 
 		} else {
-			//root node 
+			//root node
 
 			var itemMaps: Map<string, FpcItem> = new Map();
 			this.config = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(this.workspaceRoot));
@@ -185,7 +185,7 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 			}
 
 
-			//});  
+			//});
 			// if(info.ischanged){
 			// 	config.update("tasks",info.tasks,vscode.ConfigurationTarget.WorkspaceFolder);
 			// }
@@ -197,7 +197,7 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 
 	}
 	async GetDefaultTaskOption(): Promise<CompileOption>  {
-		
+
 		//refresh tasks
 		await vscode.tasks.fetchTasks({type:'fpc'});
 
@@ -206,20 +206,14 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 		let is_first=true;
 		if (cfg?.tasks != undefined) {
 			for (const e of cfg?.tasks) {
-				if (e.type === 'fpc') {		
+				if (e.type === 'fpc') {
 					if (e.group?.isDefault) {
 						let def=taskProvider.GetTaskDefinition(e.label);
-						
+
 						opt = new CompileOption(def,this.workspaceRoot);
 						this.defaultCompileOption=opt;
 						return opt;
 					}
-					if(is_first){
-						is_first=false;
-						let def=taskProvider.GetTaskDefinition(e.label);					
-						opt = new CompileOption(def,this.workspaceRoot);
-					}
-
 				}
 			}
 		}
@@ -330,12 +324,12 @@ export class FpcItem extends vscode.TreeItem {
 			};
 			this.command = command;
 		}
-		
+
 		this.iconPath=this.level? new vscode.ThemeIcon('wrench'):path.join(__filename, '..','..',  'images','pascal-project.png');
 
 		//https://code.visualstudio.com/api/references/icons-in-labels
 
-		//this.command!.command= "workbench.action.tasks.configureTaskRunner"; 
+		//this.command!.command= "workbench.action.tasks.configureTaskRunner";
 		//this.command!.arguments?.push(this.id);
 
 	}
