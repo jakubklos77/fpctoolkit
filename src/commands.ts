@@ -177,20 +177,90 @@ export class FpcCommandManager {
 
         if (editor) {
             const cursorPosition = editor.selection.active; // Get current cursor position
-
-            // Get the full text from the cursor to the end of the document
             const documentText = editor.document.getText();
             const textAfterCursor = documentText.slice(editor.document.offsetAt(cursorPosition));
+            const textBeforeCursor = documentText.slice(editor.document.offsetAt(cursorPosition) - 1, editor.document.offsetAt(cursorPosition));
+            
+            let deleteLength = 0;
+            
+            // Helper function to determine if a character is a word character
+            const isWordChar = (char: string) => /[a-zA-Z0-9_#]/.test(char);
 
-            // Regular expression to match leading spaces, blank lines, and trim them
-            const trimmedText = textAfterCursor.replace(/^\s*\n*/, '');  // Remove leading blank lines and spaces
+            // Helper function to determine if a character is whitespace
+            const isWhitespace = (char: string) => /\s/.test(char);
 
-            // Get the range from the cursor to the end of the document
-            const range = new vscode.Range(cursorPosition, editor.document.positionAt(documentText.length));
+            // Helper function to determine if a character is a special character
+            const isSpecialChar = (char: string) => /[^\w\s]/.test(char);
 
-            // Perform the text replacement with the trimmed text
+            // Helper function for CRLF detection
+            const isCRLF = (char: string) => char === '\n' || char === '\r';
+
+            // Initialize flags
+            let isStartWord = false;
+            let isBeforeWord = false;
+            let isStartCRLF = false;
+            if (textBeforeCursor.length>0)
+                isBeforeWord = isWordChar(textBeforeCursor[0]);
+            if (textAfterCursor.length>0) {
+                isStartWord = isWordChar(textAfterCursor[0]);
+                isStartCRLF = isCRLF(textAfterCursor[0]);
+            }
+            
+            for (let i = 0; i < textAfterCursor.length; i++) {
+
+                const char = textAfterCursor[i];
+                const nextChar = textAfterCursor[i + 1] || '';
+
+                if (isWhitespace(char)) {
+                    // If in whitespace, delete spaces and tabs until the next non-whitespace character
+                    if (isCRLF(char)) {
+
+                        if (isStartCRLF && isWhitespace(nextChar) && !isCRLF(nextChar)) {
+                            isStartCRLF = false;
+                            continue;
+                        }
+
+                        // If a blank line is encountered, delete only the first one and stop
+                        deleteLength = i + 1;
+                        break;
+                    } else if (!isWhitespace(nextChar)) {
+                        deleteLength = i + 1;
+                        break;
+                    }
+                } else if (isWordChar(char)) {
+                    // If in a word, delete until the end of the word or a special character
+                    if (!isWordChar(nextChar)) {
+                        
+                        // The char before was not a word so we want to delete all the way to next whitespaces
+                        if (!isBeforeWord && isWhitespace(nextChar) && !isCRLF(nextChar))
+                            continue;
+
+                        deleteLength = i + 1;
+                        break;
+                    }
+                } else if (isSpecialChar(char)) {
+                    // If in special characters, delete until the group of special characters ends
+                    if (!isSpecialChar(nextChar)) {
+
+                        // Delete to all whitespaces
+                        if (isWhitespace(nextChar) && !isCRLF(nextChar)) 
+                            continue;
+
+                        deleteLength = i + 1;
+                        break;
+                    }
+                }
+            }
+
+            // Get the range to delete
+            const range = new vscode.Range(
+                cursorPosition,
+                editor.document.positionAt(editor.document.offsetAt(cursorPosition) + deleteLength)
+            );
+
+            // Perform the text replacement (deletion)
             await editor.edit(editBuilder => {
-                editBuilder.replace(range, trimmedText);
+                editBuilder.delete(range);
             });
         }        
     };
