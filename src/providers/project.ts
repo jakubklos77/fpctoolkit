@@ -207,9 +207,9 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 			for (const e of cfg?.tasks) {
 				if (e.type === 'fpc') {
 					if (e.group?.isDefault) {
-						let def=taskProvider.GetTaskDefinition(e.label);
+						let def = taskProvider.GetTaskDefinition(e.label);
 
-						opt = new CompileOption(def,this.workspaceRoot);
+						opt = new CompileOption(def, this.workspaceRoot);
 						this.defaultCompileOption=opt;
 						return opt;
 					}
@@ -217,9 +217,9 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 			}
 		}
 		if(!opt){
-			opt=new CompileOption();
+			opt = new CompileOption();
 		}
-		this.defaultCompileOption=opt;
+		this.defaultCompileOption = opt;
 		return opt;
 	}
 	private findJsonDocumentPosition(documentText: string, taskItem: FpcItem) {

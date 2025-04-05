@@ -95,6 +95,7 @@ export class FpcCommandManager {
 
     };
     ProjectBuildInternal = async (node: FpcItem, rebuild: boolean = false) => {
+
         vscode.tasks.fetchTasks({ type: 'fpc' }).then((e) => {
             e.forEach((task) => {
                 //vscode.window.showInformationMessage(task.name);

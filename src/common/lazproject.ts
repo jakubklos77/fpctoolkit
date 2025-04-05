@@ -70,7 +70,7 @@ class LazProject {
         let lazProjectResult: LazProjectOptions | null = null;
 
         // get project
-        let task = this.getDefaultProjectTaskDefinition();
+        let task = this.getDefaultProjectFpcTaskDefinition();
         if (task && task.file) {
             // check if relative path
             let project = task.file;
@@ -134,7 +134,7 @@ class LazProject {
         this.processFpcOptionStringList(fpcOptions, '', project.CustomOptions);
     }
 
-    public getDefaultProjectTaskDefinition(): FpcTaskDefinition | null {
+    public getDefaultProjectFpcTaskDefinition(): FpcTaskDefinition | null {
 
         if (!vscode.workspace.workspaceFolders)
             return null;
@@ -167,27 +167,18 @@ class LazProject {
 
     public async GetProjectArgs(): Promise<string> {
 
-        let task = this.getDefaultProjectTaskDefinition();
+        let task = this.getDefaultProjectFpcTaskDefinition();
         if (!task)
             return '';
 
         return task.launchArgs ?? '';
     }
 
-    private async getDefaultProjectTask(): Promise<vscode.Task | null> {
+    private async runDefaultBuildTask() {
 
         // Fetch the default build task
         const tasks = await vscode.tasks.fetchTasks({ type: 'fpc' });
         const buildTask = tasks.find(task => task.group?.isDefault === true);
-
-        return buildTask ?? null;
-    }
-
-    private async runDefaultBuildTask() {
-
-        // Fetch the default build task
-        const buildTask = await this.getDefaultProjectTask()
-
         if (!buildTask)
             return;
 
