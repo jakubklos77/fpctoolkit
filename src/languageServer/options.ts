@@ -16,7 +16,7 @@ export class CompileOption {
     public windows?: { customOptions?: string[] };
     public linux?: { customOptions?: string[] };
     public darwin?: { customOptions?: string[] };
-    
+
     public presentation = {
         showReuseMessage: false,
         clear: true,
@@ -45,7 +45,7 @@ export class CompileOption {
             }else{
                 this.cwd=taskDefinition.cwd??"";
             }
-           
+
 
         } else {
             this.buildOption = {
@@ -155,7 +155,7 @@ export class CompileOption {
         this.buildOption?.customOptions?.forEach((e) => {
             s += e + " ";
         });
-       
+
 
         return s;
     }
@@ -225,19 +225,19 @@ export class InitializationOptions {
         this.ignoreTextCompletions = cfg.get<boolean>('ignoreTextCompletions');
     }
 
-    public async updateByCompileOption(opt: CompileOption) {
+    public updateByCompileOption(opt: CompileOption) {
         this.cwd = opt.cwd;
         this.program = opt.file;
         let fpcOptions: Array<string> = this.fpcOptions;
         let newopt = opt.toOptionString().split(' ');
         newopt.forEach((s) => {
             //if (s.startsWith('-Fi') || s.startsWith('-Fu') || s.startsWith('-d') || s.startsWith('-M')) {
-            if (!s.startsWith('-v')) { //-v will raise error ,hide it 
+            if (!s.startsWith('-v')) { //-v will raise error ,hide it
                 fpcOptions.push(s);
             }
         });
 
         // handle current project
-        await lazproject.HandleCurrentProject(fpcOptions);
+        lazproject.HandleCurrentProject(fpcOptions);
     }
 }

@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { FpcTaskDefinition, taskProvider } from '../providers/task';
+import { CompileOption } from '../languageServer/options';
 
 export class LazProjectOptions {
 
@@ -64,12 +65,12 @@ class LazProject {
         });
     }
 
-    public async LoadCurrentProjectOptions(): Promise<LazProjectOptions | null> {
+    public LoadCurrentProjectOptions(): LazProjectOptions | null {
 
         let lazProjectResult: LazProjectOptions | null = null;
 
         // get project
-        let task = await this.getDefaultProjectTaskDefinition();
+        let task = this.getDefaultProjectTaskDefinition();
         if (task && task.file) {
             // check if relative path
             let project = task.file;
@@ -117,10 +118,10 @@ class LazProject {
         return lazProjectResult;
     }
 
-    public async HandleCurrentProject(fpcOptions: Array<string>) {
+    public HandleCurrentProject(fpcOptions: Array<string>) {
 
         // load
-        let project = await this.LoadCurrentProjectOptions();
+        let project = this.LoadCurrentProjectOptions();
         if (!project)
             return;
 
@@ -133,23 +134,40 @@ class LazProject {
         this.processFpcOptionStringList(fpcOptions, '', project.CustomOptions);
     }
 
-    public async getDefaultProjectTaskDefinition(): Promise<FpcTaskDefinition | null> {
+    public getDefaultProjectTaskDefinition(): FpcTaskDefinition | null {
 
-        // Fetch the default build task
-        const currentTask = await this.getDefaultProjectTask();
-        if (!currentTask)
+        if (!vscode.workspace.workspaceFolders)
             return null;
 
-        let task = currentTask ? taskProvider.GetTaskDefinition(currentTask.name) : null;
-        if (!task)
-            return null;
+        // get workspace root
+        let workspaceRoot = vscode.workspace.workspaceFolders[0].uri.fsPath;
 
-        return task;
+        // fetch tasks from workspace
+        let cfg=vscode.workspace.getConfiguration('tasks', vscode.Uri.file(workspaceRoot));
+        let result: FpcTaskDefinition|null = null;
+        let is_first=true;
+        if (cfg?.tasks != undefined) {
+            for (const e of cfg?.tasks) {
+                if (e.type === 'fpc') {
+                    if (e.group?.isDefault) {
+
+                        // create if default
+                        result = new FpcTaskDefinition();
+                        result.file = e.file;
+                        result.label = e.label;
+                        result.launchArgs = e.launchArgs;
+                        return result;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     public async GetProjectArgs(): Promise<string> {
 
-        let task = await this.getDefaultProjectTaskDefinition();        
+        let task = this.getDefaultProjectTaskDefinition();
         if (!task)
             return '';
 
@@ -236,8 +254,8 @@ class LazProject {
 
     public async CheckBeforeBuild() {
 
-        // load 
-        let project = await this.LoadCurrentProjectOptions();
+        // load
+        let project = this.LoadCurrentProjectOptions();
         if (!project)
             return;
 
@@ -268,7 +286,7 @@ class LazProject {
 
                 matched = true;
 
-                // all other tasks - reset    
+                // all other tasks - reset
             } else {
                 if (typeof (task.group) === 'object') {
                     task.group.isDefault = undefined;

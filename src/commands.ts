@@ -25,13 +25,13 @@ export class FpcCommandManager {
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.newproject', this.ProjectNew));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.add', this.ProjectAdd));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.setdefault', this.ProjectSetDefault));
-        
-        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.activate', this.ProjectActivate));        
+
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.activate', this.ProjectActivate));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.cwd', this.GetCWD));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.program', this.GetProgram));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.checkforrebuild', this.CheckForRebuild));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.launchargs', this.GetLaunchArgs));
-        
+
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.complete',this.CodeComplete));
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.rename',this.CodeRename));
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.trimfromcursor',this.TrimFromCursor));
@@ -79,7 +79,7 @@ export class FpcCommandManager {
             if(isDebug){
                 v.buildOption.customOptions=[customOption,'-gw2'];
             }
-            
+
             let tasks = config.tasks;
             if (tasks) {
                 tasks.push(v);
@@ -102,9 +102,9 @@ export class FpcCommandManager {
                     let newtask=taskProvider.taskMap.get(task.name);
                     if(newtask){
                         if (!node.forceRebuild && !rebuild) {
-                            (newtask as FpcTask).BuildMode=BuildMode.normal;   
+                            (newtask as FpcTask).BuildMode=BuildMode.normal;
                         } else {
-                            (newtask as FpcTask).BuildMode=BuildMode.rebuild;   
+                            (newtask as FpcTask).BuildMode=BuildMode.rebuild;
                         }
                     }
                     vscode.tasks.executeTask(task);
@@ -137,21 +137,21 @@ export class FpcCommandManager {
     CheckForRebuild = async (node?: FpcItem) => {
 
         await lazproject.CheckBeforeBuild();
-        return ""; 
+        return "";
     };
     GetProgram = async (node?: FpcItem) => {
 
-        let project = await lazproject.LoadCurrentProjectOptions();
+        let project = lazproject.LoadCurrentProjectOptions();
         if (!project)
             return "";
-        return project.Target; 
+        return project.Target;
     };
     GetCWD = async (node?: FpcItem) => {
 
-        let project = await lazproject.LoadCurrentProjectOptions();
+        let project = lazproject.LoadCurrentProjectOptions();
         if (!project)
             return "";
-        return project.CWD; 
+        return project.CWD;
     };
     GetLaunchArgs = async (node?: FpcItem) => {
 
@@ -166,7 +166,7 @@ export class FpcCommandManager {
         if (file) {
 
             await lazproject.ProjectActivate(this.workspaceRoot, file);
-            
+
             // restart LSP
             client.restart();
         }
@@ -180,9 +180,9 @@ export class FpcCommandManager {
             const documentText = editor.document.getText();
             const textAfterCursor = documentText.slice(editor.document.offsetAt(cursorPosition));
             const textBeforeCursor = documentText.slice(editor.document.offsetAt(cursorPosition) - 1, editor.document.offsetAt(cursorPosition));
-            
+
             let deleteLength = 0;
-            
+
             // Helper function to determine if a character is a word character
             const isWordChar = (char: string) => /[a-zA-Z0-9_#]/.test(char);
 
@@ -205,7 +205,7 @@ export class FpcCommandManager {
                 isStartWord = isWordChar(textAfterCursor[0]);
                 isStartCRLF = isCRLF(textAfterCursor[0]);
             }
-            
+
             for (let i = 0; i < textAfterCursor.length; i++) {
 
                 const char = textAfterCursor[i];
@@ -230,7 +230,7 @@ export class FpcCommandManager {
                 } else if (isWordChar(char)) {
                     // If in a word, delete until the end of the word or a special character
                     if (!isWordChar(nextChar)) {
-                        
+
                         // The char before was not a word so we want to delete all the way to next whitespaces
                         if (!isBeforeWord && isWhitespace(nextChar) && !isCRLF(nextChar))
                             continue;
@@ -243,7 +243,7 @@ export class FpcCommandManager {
                     if (!isSpecialChar(nextChar)) {
 
                         // Delete to all whitespaces
-                        if (isWhitespace(nextChar) && !isCRLF(nextChar)) 
+                        if (isWhitespace(nextChar) && !isCRLF(nextChar))
                             continue;
 
                         deleteLength = i + 1;
@@ -262,7 +262,7 @@ export class FpcCommandManager {
             await editor.edit(editBuilder => {
                 editBuilder.delete(range);
             });
-        }        
+        }
     };
     ProjectNew = async () => {
 
@@ -270,8 +270,8 @@ export class FpcCommandManager {
 {$mode objfpc}{$H+}
 uses
   classes,sysutils;
-begin 
-   
+begin
+
 end.`;
 
         let file = path.join(this.workspaceRoot, "main.lpr");
@@ -382,21 +382,21 @@ end.`;
             // match our task
             if(task.label===node.label && task.file===node.file){
                 if(typeof(task.group)==='object'){
-                    task.group.isDefault=true;    
+                    task.group.isDefault=true;
                 }else{
                     task.group={kind:task.group,isDefault:true};
                 }
-               
-            // all other tasks - reset    
+
+            // all other tasks - reset
             }else{
                 if(typeof(task.group)==='object'){
                     task.group.isDefault=undefined;
                 }
             }
-           
+
 
         }
-        
+
         await config.update(
             "tasks",
             tasks,
@@ -410,9 +410,9 @@ end.`;
     }
     CodeComplete = async (textEditor: TextEditor, edit: TextEditorEdit) => {
         client.doCodeComplete(textEditor);
-      
+
     }
     CodeRename = async (textEditor: TextEditor, edit: TextEditorEdit) => {
-        client.doCodeRename(textEditor);    
+        client.doCodeRename(textEditor);
     }
 }

@@ -1,7 +1,7 @@
 /**
  * @File   : client.ts
  * @Author :  (coolchyni)
- * @Link   : 
+ * @Link   :
  * @Date   : 2/16/2022, 11:26:06 PM
  */
 import path = require('path');
@@ -105,7 +105,7 @@ function GetEnvironmentVariables(): {} {
                 if (fs.pathExistsSync(_dir)) {
                     let subdirs = fs.readdirSync(_dir);
                     for (const fpcver of subdirs) {
-                        if (ver_test.test(fpcver)) { //found it 
+                        if (ver_test.test(fpcver)) { //found it
                             if (_dir.startsWith('C:/lazarus')) {
                                 userEnvironmentVariables['LAZARUSDIR'] = 'C:/lazarus';
                                 env['LAZARUSDIR'] = userEnvironmentVariables['LAZARUSDIR'];
@@ -396,7 +396,7 @@ export class TLangClient implements ErrorHandler {
 
         let opt = await this.projProvider.GetDefaultTaskOption();
         if (opt != undefined) {
-            await initializationOptions.updateByCompileOption(opt);
+            initializationOptions.updateByCompileOption(opt);
         } else {
             opt = new CompileOption();
             opt.buildOption!.targetCPU = this.targetCPU;

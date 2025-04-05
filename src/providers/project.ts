@@ -203,7 +203,6 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 
 		let cfg=vscode.workspace.getConfiguration('tasks', vscode.Uri.file(this.workspaceRoot));
 		let opt: CompileOption|undefined=undefined;
-		let is_first=true;
 		if (cfg?.tasks != undefined) {
 			for (const e of cfg?.tasks) {
 				if (e.type === 'fpc') {
