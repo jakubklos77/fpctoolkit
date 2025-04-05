@@ -156,6 +156,11 @@ class LazProject {
                         result.file = e.file;
                         result.label = e.label;
                         result.launchArgs = e.launchArgs;
+                        result.cwd = e.cwd;
+                        result.cleanExt = e.cleanExt;
+                        result.inherited = e.inherited;
+                        result.buildOption = e.buildOption;
+                        result.buildEvent = e.buildEvent;
                         return result;
                     }
                 }

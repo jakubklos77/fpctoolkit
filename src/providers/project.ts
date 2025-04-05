@@ -11,6 +11,7 @@ import { pathExists } from 'fs-extra';
 import { Event } from 'vscode-languageclient';
 import { clearTimeout } from 'timers';
 import { TIMEOUT } from 'dns';
+import { lazproject } from '../common/lazproject'
 
 export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 
@@ -71,7 +72,7 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 		}
 
 		//default task setting changed
-		let newCompileOption=await this.GetDefaultTaskOption();
+		let newCompileOption = this.GetDefaultProjectCompileOption();
 		if(oldCompileOption.toOptionString()!=newCompileOption.toOptionString()){
 			taskProvider.refresh();
 		}
@@ -196,26 +197,17 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 		return Promise.resolve([]);
 
 	}
-	async GetDefaultTaskOption(): Promise<CompileOption>  {
+	GetDefaultProjectCompileOption(): CompileOption  {
 
-		//refresh tasks
-		await vscode.tasks.fetchTasks({type:'fpc'});
-
-		let cfg=vscode.workspace.getConfiguration('tasks', vscode.Uri.file(this.workspaceRoot));
 		let opt: CompileOption|undefined=undefined;
-		if (cfg?.tasks != undefined) {
-			for (const e of cfg?.tasks) {
-				if (e.type === 'fpc') {
-					if (e.group?.isDefault) {
-						let def = taskProvider.GetTaskDefinition(e.label);
+		let taskDef = lazproject.getDefaultProjectFpcTaskDefinition();
 
-						opt = new CompileOption(def, this.workspaceRoot);
-						this.defaultCompileOption=opt;
-						return opt;
-					}
-				}
-			}
+		if (taskDef) {
+			opt = new CompileOption(taskDef, this.workspaceRoot);
+			this.defaultCompileOption = opt;
+			return opt;
 		}
+
 		if(!opt){
 			opt = new CompileOption();
 		}
