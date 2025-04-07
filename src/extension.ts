@@ -39,22 +39,17 @@ export async function activate(context: vscode.ExtensionContext) {
 	let ProjectProvider = new FpcProjectProvider(workspaceRoot, context);
 	vscode.window.registerTreeDataProvider("FpcProjectExplorer", ProjectProvider);
 
-	//taskProvider=new FpcTaskProvider(workspaceRoot);
 	context.subscriptions.push(vscode.tasks.registerTaskProvider(
 		FpcTaskProvider.FpcTaskType,
 		taskProvider
 	)
 	);
 
-
-
 	MyCodeAction.activate(context);
 
 	client = new TLangClient(ProjectProvider);
 	await client.doInit();
 	client.start();
-
-
 }
 
 function onDidChangeTextDocument(e: vscode.TextDocumentChangeEvent) {

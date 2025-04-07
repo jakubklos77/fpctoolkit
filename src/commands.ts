@@ -162,15 +162,10 @@ export class FpcCommandManager {
 
         // get node file
         let file = node?.file;
+        if (!file)
+            return;
 
-        // if set
-        if (file) {
-
-            await lazproject.ProjectActivate(this.workspaceRoot, file);
-
-            // restart LSP
-            client.restart();
-        }
+        lazproject.ProjectActivate(this.workspaceRoot, file);
     };
     TrimFromCursor = async (textEditor: TextEditor, edit: TextEditorEdit) => {
 

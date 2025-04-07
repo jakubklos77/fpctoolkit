@@ -383,10 +383,6 @@
             },
             "description": "%config.customOptions%"
           },
-          "fpctoolkit.currentProject": {
-            "type": "string",
-            "description": "%config.currentProject%"
-          },
           "fpctoolkit.env.PP": {
             "type": "string",
             "markdownDescription": "%config.env.PP%"

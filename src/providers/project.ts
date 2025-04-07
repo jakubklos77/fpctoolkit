@@ -23,10 +23,14 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 	private config!:vscode.WorkspaceConfiguration;
 	private defaultCompileOption?:CompileOption=undefined;
 	private timeout?:NodeJS.Timeout=undefined;
+
+	private lastOpenProjectClickTime = 0;
+	private lastOpenProjectElement: FpcItem | undefined;
+
 	constructor(private workspaceRoot: string, context: vscode.ExtensionContext) {
 		const subscriptions = context.subscriptions;
 		const name = 'FpcProjectExplorer';
-		subscriptions.push(vscode.commands.registerCommand(name + ".open", async (item: FpcItem) => { await this.open(item); }, this));
+		subscriptions.push(vscode.commands.registerCommand(name + ".open", async (item: FpcItem) => { await this.OpenProject(item); }, this));
 
 		this.watch = vscode.workspace.createFileSystemWatcher(path.join(workspaceRoot,".vscode","tasks.json"), false);
 		this.watch.onDidChange(async (url) => {
@@ -115,10 +119,6 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 
 			var itemMaps: Map<string, FpcItem> = new Map();
 			this.config = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(this.workspaceRoot));
-			//create info for pass tasks as pointer
-			//var info =new TaskInfo();
-			//info.tasks=config.tasks;
-
 
 			this.config?.tasks?.forEach((e: any) => {
 				if (e.type === 'fpc') {
@@ -143,59 +143,12 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 			});
 			let items: FpcItem[] = [];
 
-
-			/*
-			vscode.workspace.workspaceFolders!.forEach(item => {
-				let files = fs.readdirSync(item.uri.fsPath);
-				for (let index = 0; index < files.length; index++) {
-
-					let file = files[index];
-
-					if (file.toLowerCase().endsWith('.lpr') || file.toLowerCase().endsWith('.dpr')) {
-						try {
-							if (itemMaps.has(file)) {
-								itemMaps.get(file)!.fileexist = true;
-								continue;
-							}
-
-							itemMaps.set(
-								file,
-								new FpcItem(
-									0,
-									file,
-									vscode.TreeItemCollapsibleState.Expanded,
-									file,
-									true,
-									false
-
-								)
-							);
-
-						} catch (error) {
-							vscode.window.showErrorMessage("FPCToolkit:" + Error(<string>error).message);
-						}
-
-
-					}
-				}
-			});
-			*/
-
 			for (const e of itemMaps.values()) {
 				items.push(e);
 			}
 
-
-			//});
-			// if(info.ischanged){
-			// 	config.update("tasks",info.tasks,vscode.ConfigurationTarget.WorkspaceFolder);
-			// }
-
 			return Promise.resolve(items);
 		}
-
-		return Promise.resolve([]);
-
 	}
 	GetDefaultProjectCompileOption(): CompileOption  {
 
@@ -270,16 +223,36 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 		// return scriptOffset;
 		return documentText.indexOf('"label": "'+taskItem.label+'"');
 	}
-	private async open(selection: FpcItem) {
 
-		let taskfile = vscode.Uri.file(path.join(this.workspaceRoot, '.vscode', 'tasks.json'))
+	private async OpenProject(selection: FpcItem) {
 
-		fs.existsSync(taskfile.fsPath)
-		{
-			const document: vscode.TextDocument = await vscode.workspace.openTextDocument(taskfile);
-			const offset = this.findJsonDocumentPosition(document.getText(), selection);
-			const position = document.positionAt(offset);
-			await vscode.window.showTextDocument(document, { selection: new vscode.Selection(position, position) });
+		// Init
+		const now = Date.now();
+		const DOUBLE_CLICK_THRESHOLD = 300; // ms
+		let isDoubleClick = false;
+
+		// Double-click detection
+		if (this.lastOpenProjectElement === selection && now - this.lastOpenProjectClickTime < DOUBLE_CLICK_THRESHOLD)
+			isDoubleClick = true;
+
+		// Mark new
+		this.lastOpenProjectClickTime = now;
+		this.lastOpenProjectElement = selection;
+
+		if (!isDoubleClick) {
+			let taskfile = vscode.Uri.file(path.join(this.workspaceRoot, '.vscode', 'tasks.json'))
+
+			fs.existsSync(taskfile.fsPath)
+			{
+				const document: vscode.TextDocument = await vscode.workspace.openTextDocument(taskfile);
+				const offset = this.findJsonDocumentPosition(document.getText(), selection);
+				const position = document.positionAt(offset);
+				await vscode.window.showTextDocument(document, { selection: new vscode.Selection(position, position) });
+			}
+		} else {
+
+			// Activate
+			lazproject.ProjectActivate(this.workspaceRoot, selection.file);
 		}
 	}
 

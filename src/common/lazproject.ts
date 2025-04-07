@@ -7,6 +7,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { FpcTaskDefinition, taskProvider } from '../providers/task';
 import { CompileOption } from '../languageServer/options';
+import { client } from '../extension';
 
 export class LazProjectOptions {
 
@@ -196,10 +197,10 @@ class LazProject {
                 if (event.execution === taskExecution) {
                     disposable.dispose(); // Clean up listener
                     if (event.exitCode === 0) {
-                        vscode.window.showInformationMessage("Build completed successfully.");
+                        //vscode.window.showInformationMessage("Build completed successfully.");
                         resolve();
                     } else {
-                        vscode.window.showErrorMessage("Build task failed.");
+                        //vscode.window.showErrorMessage("Build task failed.");
                         reject(new Error("Build failed"));
                     }
                 }
@@ -298,7 +299,10 @@ class LazProject {
         );
 
         // reload tasks
-        vscode.commands.executeCommand('workbench.action.tasks.reloadTasks');
+        await vscode.commands.executeCommand('workbench.action.tasks.reloadTasks');
+
+        // restart LSP
+        client.restart();
 
     }
 }
