@@ -33,6 +33,8 @@ export class FpcCommandManager {
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.launchargs', this.GetLaunchArgs));
 
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.complete',this.CodeComplete));
+
+        // General commands
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.rename',this.CodeRename));
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.trimfromcursor',this.TrimFromCursor));
     }

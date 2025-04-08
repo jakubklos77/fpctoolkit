@@ -32,7 +32,9 @@
   },
   "activationEvents": [
     "onView:FpcProjectExplorer",
-    "onLanguage:objectpascal"
+    "onLanguage:objectpascal",
+    "onCommand:fpctoolkit.code.rename",
+    "onCommand:fpctoolkit.editor.trimfromcursor"
   ],
   "main": "./out/extension.js",
   "contributes": {
