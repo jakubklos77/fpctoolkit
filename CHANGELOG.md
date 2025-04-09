@@ -1,5 +1,31 @@
-## [Unreleased]
-- Using lazarus project files 
+## [1.2.3] - 2025-04-09
+## add:
+- problem matcher - Hints supported as well
+- problem matcher - IDE jumps to the first error in the code
+- syntax error checks - better format like in Lazarus/FPC
+## add:
+- more indentation rules
+
+## [1.2.2] - 2025-04-09
+## add:
+- double click to activate a project
+- delete to first word (Ctrl+T) 100% like Lazarus
+## fix:
+- "rename" F2 and "delete to first word" Ctrl+T - commands working even if addon not activated
+
+## [1.2.1] - 2025-04-09
+## add:
+- go to implementation works with dirty files (unsaved and changed text)
+- Ctrl+T - "delete to first word" - works like in Lazarus IDE
+- startup speed greatly enhanced (starts in 1 sec now)
+
+## [1.2.0] - 2025-04-09
+## add:
+- Lazarus .lpi project support
+- lazbuild tasks
+- project management
+## fix:
+- problem matcher
 
 ## [1.1.9] - 2022-12-17
 ## add:
@@ -14,15 +40,15 @@
 
 ## [1.1.6] - 2022-12-06
 ## add:
--  add build events 
+-  add build events
 
 ## [1.1.5] - 2022-11-23
 ## fixed:
-- can't start language server on linux 
+- can't start language server on linux
 
 ## [1.1.4] - 2022-10-15
 ## fixed:
-- quick fix not worked 
+- quick fix not worked
 
 ## [1.1.3] - 2022-10-14
 ### add:
@@ -31,14 +57,14 @@
 - document symbols navigation
 - remove ununsed unit
 ### fixed:
-- Enhance the stability of the program pasls 
+- Enhance the stability of the program pasls
 
 ## [1.1.0]
-- pascal language server 
+- pascal language server
 - code snippets
 - auto completion
 - gotoDeclaration, gotoDefinition
-- references 
+- references
 - documentHighlight
 - i18n support
 

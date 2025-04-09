@@ -30,7 +30,7 @@
 	},
     "indentationRules": {
         "increaseIndentPattern": {
-            "pattern": "^\\s*(begin|repeat|case|private|public|published|protected|var|try|finally)\\b.*$",
+            "pattern": "^\\s*(begin|repeat|case|private|public|published|protected|var|try|finally|type|uses)\\b.*$",
             "flags": "i"
         },
         "decreaseIndentPattern": {
