@@ -94,7 +94,7 @@ class LazProject {
                         return lazProjectResult;
                     }
                     // Process the parsed XML result
-                    if (result && result.CONFIG && result.CONFIG.CompilerOptions) {
+                    if (result?.CONFIG?.CompilerOptions) {
 
                         lazProjectResult = new LazProjectOptions();
 
@@ -174,10 +174,7 @@ class LazProject {
     public async GetProjectArgs(): Promise<string> {
 
         let task = this.getDefaultProjectFpcTaskDefinition();
-        if (!task)
-            return '';
-
-        return task.launchArgs ?? '';
+        return task?.launchArgs ?? '';
     }
 
     private async runDefaultBuildTask() {
