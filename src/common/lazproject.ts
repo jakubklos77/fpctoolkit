@@ -201,7 +201,8 @@ class LazProject {
                         resolve();
                     } else {
                         //vscode.window.showErrorMessage("Build task failed.");
-                        reject(new Error("Build failed"));
+                        //reject(new Error("Build failed"));
+                        vscode.commands.executeCommand('workbench.action.debug.stop');
                     }
                 }
             });

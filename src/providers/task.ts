@@ -218,7 +218,7 @@ export class FpcTask extends vscode.Task {
 				}
 
 				if (!lazbuild) {
-					buildOptionString += '-vq '; //show message numbers 
+					buildOptionString += '-vq '; //show message numbers
 				}
 
 				let fpcpath = process.env['PP'];//  configuration.get<string>('env.PP');
@@ -254,13 +254,13 @@ export class FpcTask extends vscode.Task {
 									let result=ChildProcess.execSync(cmd);
 									terminal.emit(result.toString())
 								}
-							
+
 							}
-							
+
 					}
 
 				}
-				
+
 				terminal.args = `${taskDefinition?.file} ${buildOptionString}`.trim().split(' ');
 				if (this._BuildMode == BuildMode.rebuild || forceRebuild) {
 					terminal.args.push('-B');
@@ -302,7 +302,7 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 	constructor(private cwd: string, private fpcpath: string) {
 		this.diagMaps = new Map<string, vscode.Diagnostic[]>();
 		this.onDidClose((e) => {
-			//vscode.window.showInformationMessage('onDidClose');	
+			//vscode.window.showInformationMessage('onDidClose');
 		});
 	}
 	code: number | undefined;
@@ -496,33 +496,19 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 				let level = matchs[6];
 				let msgcode = matchs[7];
 				let msg = matchs[8];
-				// this.emit(
-				// 	TerminalEscape.apply({ msg: file+"("+ln+','+col +") ", style: TE_Style.Blue })+
-				// 	TerminalEscape.apply({ msg: level+":"+msg, style: TE_Style.Red })
-				// );
 
 				let diag = new vscode.Diagnostic(
 					new vscode.Range(new vscode.Position(ln - 1, col - 1), new vscode.Position(ln - 1, col - 1)),
-					msg,
+					level + ': ' + msg,
 					this.getDiagnosticSeverity(level)
 				);
 				diag.code = Number.parseInt(msgcode);
 
-				// if(msg.match(/ Local variable ".*?".*?(?:not|never) used/))
-				// {
-				// 	diag.code='variable-not-used';
-				// }
 				let basename = file;
-				// if((cur_file=="")||(path.basename(cur_file)!=path.basename(file))){
-				// 	cur_file=file;
-				// }
 				if (this.diagMaps?.has(basename)) {
-
 					this.diagMaps.get(basename)?.push(diag);
 				} else {
-
 					this.diagMaps.set(basename, [diag]);
-
 				}
 				if (diag.severity == DiagnosticSeverity.Error) {
 					this.emit(TerminalEscape.apply({ msg: line, style: [TE_Style.Red] }));
