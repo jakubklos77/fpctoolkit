@@ -427,6 +427,14 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 					this.event_after_build(code==0);
 				}
 				//This is a exitcode,not zero meens failure.
+				if (code!=0) {
+
+					// Focus problems
+					vscode.commands.executeCommand('workbench.actions.focusProblems');
+
+					// Select the first
+					vscode.commands.executeCommand('list.select');
+				}
 
 
 				resolve(0);
@@ -475,7 +483,8 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 			case 'Note':
 				return vscode.DiagnosticSeverity.Information;
 			case 'Hint':
-				return vscode.DiagnosticSeverity.Hint;
+//				return vscode.DiagnosticSeverity.Hint;
+				return vscode.DiagnosticSeverity.Information;
 			default:
 				return vscode.DiagnosticSeverity.Information;
 		}
@@ -483,7 +492,7 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 	onOutput(lines: string) {
 		let ls = <string[]>lines.split('\n');
 		let cur_file = "";
-		let reg = /^([\w\/\.]+\.(dpr|p|pp|pas))\((\d+),(\d+)\)\s((Fatal|Error|Warning|Note):\s\((\w+)\) (.*))/
+		let reg = /^([\w\/\.]+\.(dpr|p|pp|pas))\((\d+),(\d+)\)\s((Fatal|Error|Warning|Note|Hint):\s\((\w+)\) (.*))/
 		ls.forEach(line => {
 
 			let matchs = reg.exec(line);
