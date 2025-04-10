@@ -1,15 +1,8 @@
 {
-  "array const":{
-    "prefix":"arrayc",
-    "body":[
-      "array[${1:0}..${2:1}] of ${3:type} = ($4,$0);"     
-    ],
-    "description":"array declaration(const)"
-  },
   "array var":{
     "prefix":"array",
     "body":[
-      "array[${1:0}..${2:1}] of ${0:type};"        
+      "array of $0;"
     ],
     "description":"array declaration(var)"
   },
@@ -20,7 +13,7 @@
       "\t$0",
       "end;"
     ],
-    "description": "Begin end"
+    "description": "begin end"
   },
   "case end": {
     "prefix": "case",
@@ -31,57 +24,35 @@
     ],
     "description": "case end"
   },
-  "class (no parts)": {
-    "prefix": "classd",
-    "body": [
-      "T$1 = class(${2:ancestor})",
-      "\t$3",
-      "end;"
-    ],
-    "description": "class (no parts)"
-  },
   "class (with Create/Destroy)": {
-    "prefix": "classc",
+    "prefix": "class",
     "body": [
       "T${1:ClassName} = class(T${2:ancestor})",
       "private",
-      "\t$0",
+      "\t",
       "protected",
       "\t",
       "public",
       "\tconstructor Create; override;",
       "\tdestructor Destroy; override;",
-      "published",
-      "\t",
+      "\t$0",
       "end;"
     ],
     "description": "class (with Create/Destroy)"
   },
-  "constructor Create": {
-    "prefix": "Create",
+  "constructor": {
+    "prefix": "constructor",
     "body": [
-      "constructor Create(); ${1:override;}"
+      "constructor Create;$0"
     ],
-    "description": "constructor descendant"
+    "description": "constructor"
   },
   "destructor Destroy": {
-    "prefix": "Destroy",
+    "prefix": "destructor",
     "body": [
       "destructor Destroy; override;$0"
     ],
     "description": "destructor"
-  },
-  "Create object with finally": {
-    "prefix": "CreateF",
-    "body": [
-      "${1:ObjectName} := ${2:TObject}.Create($3);",
-      "try",
-      "  $2",
-      "finally",
-      "  ${1:ObjectName}.Free;",
-      "end;"
-    ],
-    "description": "Create an object and free it in finally block"
   },
   "else end": {
     "prefix": "else",
@@ -93,25 +64,8 @@
     ],
     "description": "else end"
   },
-  "enum": {
-    "prefix": "enum",
-    "body": [
-      "T${1:EnumName} = (${2:meOne}, $0);"
-    ],
-    "description": "enum"
-  },
-  "for begin end": {
-    "prefix": "for",
-    "body": [
-      "for ${1:i} := ${2:0} to ${3:max} do",
-      "begin",
-      "\t$0",
-      "end;"
-    ],
-    "description": "for begin end"
-  },
   "for in end": {
-    "prefix": "forin",
+    "prefix": "for",
     "body": [
       "for ${1:MyElem} in ${2:MyList} do",
       "begin",
@@ -120,146 +74,13 @@
     ],
     "description": "for in end"
   },
-  "for downto": {
-    "prefix": "ford",
-    "body": [
-      "for ${1:i} := ${2:max} downto ${3:0} do",
-      "begin",
-      "\t$0",
-      "end;"
-    ],
-    "description": "for downto"
-  },
-  "for (no begin end)": {
-    "prefix": "fors",
-    "body": [
-      "for ${1:i} := ${2:0} to ${3:max} do",
-      "\t$0"
-    ],
-    "description": "for (no begin end)"
-  },
-  "function end": {
-    "prefix": "function",
-    "body": [
-      "function ${1:MyFunction}(${2}):${3};",
-      "begin",
-      "\t$0",
-      "end;"
-    ],
-    "description": "function end"
-  },
-  "if (no begin end)": {
-    "prefix": "ifn",
-    "body": [
-      "if ${1} then \t$0"
-    ],
-    "description": "if (no begin end)"
-  },
   "if end": {
     "prefix": "if",
     "body": [
       "if ${1} then",
-      "begin",
-      "\t$0",
-      "end;"
+      "$0"
     ],
-    "description": "if end"
-  },
-  "if else (no begin end)": {
-    "prefix": "ifen",
-    "body": [
-      "if ${1} then",
-      "\t$2",
-      "else",
-      "\t$3"
-    ],
-    "description": "if else (no begin end)"
-  },
-  "if else end": {
-    "prefix": "ife",
-    "body": [
-      "if ${1} then",
-      "begin",
-      "\t$2",
-      "end",
-      "else",
-      "begin",
-      "\t$3",
-      "end;"
-    ],
-    "description": "if else end"
-  },
-  "if not Assigned (no begin end)": {
-    "prefix": "ifnass",
-    "body": [
-      "if not Assigned(${1}) then",
-      "\t${1} := T${1}.Create(${2});$0"
-    ],
-    "description": "if not Assigned (no begin end)"
-  },
-  "if nil (no begin end)": {
-    "prefix": "ifnil",
-    "body": [
-      "if $1 = nil then",
-      "\t$1 := T${2:ClassName}.Create($3);$0"
-    ],
-    "description": "if nil (no begin end)"
-  },
-  "procedure end": {
-    "prefix": "procedure",
-    "body": [
-      "procedure ${1:MyProcedure}(${2});",
-      "begin",
-      "\t$0",
-      "end;"
-    ],
-    "description": "procedure"
-  },
-  "property getter": {
-    "prefix": "prop",
-    "body": [
-      "property ${1:name}: ${2:type} read Get${1} write Set${1};$0"
-    ],
-    "description": "property getter"
-  },
-  "property field": {
-    "prefix": "propf",
-    "body": [
-      "property ${1:name}: ${2:type} read F${1:name} write F${1:name};$0"
-    ],
-    "description": "property field"
-  },
-  "property read only field": {
-    "prefix": "proprof",
-    "body": [
-      "property ${1:name}: ${2:type} read F${1:name};$0"
-    ],
-    "description": "property read only field"
-  },
-  "property read only field with func": {
-    "prefix": "proprof",
-    "body": [
-      "property ${1:name}: ${2:type} read F${1:name};$0"
-    ],
-    "description": "property read only field"
-  },
-
-  "property get and set with function ": {
-    "prefix": "property get and set with function",
-    "body": [
-      "procedure Set${1:Name}(const Value: ${2:TType});",
-      "function Get${1:Name}: ${2:TType};",
-      "property ${1:Name}: ${2:TType} read Get${1:Name} write Set${1:Name};"
-    ],
-    "description": "property get and set with function"
-  },
-  "property get with function": {
-    "prefix": "property get with function",
-    "body": [
-      "function Get${1:Name}: ${2:TType};",
-      "property ${1:Name}: ${2:TType} read Get${1:Name};"
-    ],
-    "description": "property get with function"
+    "description": "if"
   },
   "raise": {
     "prefix": "raise",
@@ -267,15 +88,6 @@
       "raise ${1:Exception}.Create('${2:Error Message}');$0"
     ],
     "description": "raise"
-  },
-  "region": {
-    "prefix": "region",
-    "body": [
-      "{\\$REGION '${1:MyRegion}'}",
-      "\t$0",
-      "{\\$ENDREGION}"
-    ],
-    "description": "region"
   },
   "repeat until": {
     "prefix": "repeat",
@@ -288,7 +100,7 @@
   },
 
   "try finally": {
-    "prefix": "tryf",
+    "prefix": "try",
     "body": [
       "try",
       "\t$0",
@@ -313,7 +125,7 @@
     "prefix": "finally",
     "body": [
       "finally",
-      "  $1",
+      "\t$0",
       "end;"
     ],
     "description": "finally end"
@@ -322,26 +134,11 @@
     "prefix": "except",
     "body": [
       "except",
-      "  on E: Exception do",
-      "  begin",
-      "    $1",
-      "  end;",
+      "\ton E: Exception do $0",
       "end;"
     ],
     "description": "try except end"
   },
-  "try object finally": {
-    "prefix": "trycf",
-    "body": [
-      "${1:variable} := ${2:TComponent}.Create(${3});",
-      "try",
-      "\t$0",
-      "finally",
-      "\tFreeAndNil(${1:variable});",
-      "end;"
-    ],
-    "description": "try object finally"
-    },
   "out": {
     "prefix": "out",
     "body": [
@@ -353,50 +150,29 @@
     "prefix": "then",
     "body": [
       "then",
-      "begin",
-      "  $1",
-      "end;"
+      "\t$0"
     ],
-    "description": "then with begin end"
+    "description": "then"
   },
-  "then else": {
-    "prefix": "thene",
+  "thenb": {
+    "prefix": "then",
     "body": [
       "then",
       "begin",
-      "  $1",
-      "end",
-      "else",
-      "begin",
-      "  $2",
+      "\t$0",
       "end;"
     ],
-    "description": "then else with begin end"
+    "description": "then with begin end"
   },
   "while do": {
     "prefix": "while",
     "body": [
       "while $1 do",
       "begin",
-      "  $2",
+      "\t$2",
       "end;"
     ],
     "description": "while do"
-  },
-  "do": {
-    "prefix": "do",
-    "body": [
-      "do",
-      "  $1"
-    ],
-    "description": "do"
-  },
-  "until": {
-    "prefix": "until",
-    "body": [
-      "until ($1);"
-    ],
-    "description": "until"
   },
   "private": {
     "prefix": "private",
@@ -545,125 +321,24 @@
     ],
     "description": "{$mode }"
   },
-  
 
-  "unit with class(ObjFPC)": {
-    "prefix": "unit with class",
-    "body": [
-      "unit $1;",
-      "",
-      "{\\$mode objfpc}{\\$H+}",
-      "",
-      "interface",
-      "uses",
-      "\tSysUtils, Classes;",
-      "",
-      "type",
-      "\tT$1 = class(T${2:Object})",
-      "\tprivate",
-      "\t$0",
-      "\tprotected",
-      "\t\t",
-      "\tpublic",
-      "\t\tconstructor Create;",
-      "\t\tdestructor Destroy; override;",
-      "\tpublished",
-      "\t\t",
-      "end;",
-      "",
-      "implementation",
-      "constructor T$1.Create;",
-      "begin",
-      "\tinherited Create;",
-      "\t",
-      "end;",
-      "\t",
-      "destructor T$1.Destroy;",
-      "begin",
-      "\tinherited Destroy;",
-      "\t",
-      "end;",   
-      "",
-      "end."
-    ],
-    "description": "unit with class"
-  },
-  "unit (FPC)": {
+  "unit": {
     "prefix": "unit",
     "body": [
       "unit ${1:unit_name};",
       "",
-      "{\\$mode objfpc}{\\$H+}",
+      "uses",
+      "\tTypesUnit;",
       "",
       "interface",
       "\t",
       "uses",
-      "\tSysUtils${2:, Classes};",
+      "\tSysUtils,",
+      "\tClasses;",
       "\t",
-      "implementation",
-      "\t",
-      "$0",
-      "\t",
-      "end."
-    ],
-    "description": "unit template"
-  },
-  "unit with class(Delphi)": {
-    "prefix": "unit with class",
-    "body": [
-      "unit $1;",
-      "",
-      "{\\$mode delphi}{\\$H+}",
-      "",
-      "interface",
-      "uses",
-      "\tSysUtils, Classes;",
-      "",
-      "type",
-      "\tT$1 = class(T${2:Object})",
-      "\tprivate",
       "\t$0",
-      "\tprotected",
-      "\t\t",
-      "\tpublic",
-      "\t\tconstructor Create;",
-      "\t\tdestructor Destroy; override;",
-      "\tpublished",
-      "\t\t",
-      "end;",
-      "",
-      "implementation",
-      "constructor T$1.Create;",
-      "begin",
-      "\tinherited Create;",
-      "\t",
-      "end;",
-      "\t",
-      "destructor T$1.Destroy;",
-      "begin",
-      "\tinherited Destroy;",
-      "\t",
-      "end;",   
-      "",
-      "end."
-    ],
-    "description": "unit with class"
-  },
-  "unit (Delphi)": {
-    "prefix": "unit",
-    "body": [
-      "unit ${1:unit_name};",
-      "",
-      "{\\$mode delphi}{\\$H+}",
-      "",
-      "interface",
-      "\t",
-      "uses",
-      "\tSysUtils${2:, Classes};",
       "\t",
       "implementation",
-      "\t",
-      "$0",
       "\t",
       "end."
     ],
@@ -672,7 +347,7 @@
   "specialize":{
     "prefix":"specialize",
     "body":[
-      "specialize $0;"     
+      "specialize $0;"
     ],
     "description":"specialize declaration"
   }

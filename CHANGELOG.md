@@ -3,8 +3,9 @@
 - problem matcher - Hints supported as well
 - problem matcher - IDE jumps to the first error in the code
 - syntax error checks - better format like in Lazarus/FPC
-## add:
+## fix:
 - more indentation rules
+- snippets updated
 
 ## [1.2.2] - 2025-04-09
 ## add:
