@@ -1,5 +1,4 @@
-## WIP
-## [1.2.4] - 2025-04-10
+## [1.2.4] - 2025-04-15
 ## fix:
 - more indentation rules
 - snippets updated
