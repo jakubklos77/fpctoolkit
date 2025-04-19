@@ -1,3 +1,8 @@
+## [1.2.5] - 2025-04-15
+## fix:
+- activate project - reloadTasks no longer work (used async call), client reloaded now
+- refactor rename - support for all units
+
 ## [1.2.4] - 2025-04-15
 ## fix:
 - more indentation rules

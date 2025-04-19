@@ -225,6 +225,25 @@ export class InitializationOptions {
         this.ignoreTextCompletions = cfg.get<boolean>('ignoreTextCompletions');
     }
 
+    public HandleCurrentProject(fpcOptions: Array<string>) {
+
+        // load
+        let project = lazproject.LoadCurrentProjectOptions();
+        if (!project)
+            return;
+
+        // mode
+        fpcOptions.push("-M" + project.SyntaxMode.toLowerCase());
+
+        // options
+        lazproject.processFpcOptionStringList(fpcOptions, '-Fi', project.IncludeFiles);
+        lazproject.processFpcOptionStringList(fpcOptions, '-Fu', project.OtherUnitFiles);
+        lazproject.processFpcOptionStringList(fpcOptions, '', project.CustomOptions);
+
+        // set main file
+        this.program = project.MainFile;
+    }
+
     public updateByCompileOption(opt: CompileOption) {
         this.cwd = opt.cwd;
         this.program = opt.file;
@@ -237,6 +256,6 @@ export class InitializationOptions {
         });
 
         // handle current project
-        lazproject.HandleCurrentProject(fpcOptions);
+        this.HandleCurrentProject(fpcOptions);
     }
 }

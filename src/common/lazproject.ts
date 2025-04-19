@@ -18,6 +18,8 @@ export class LazProjectOptions {
     SyntaxMode: string = "";
     Target: string = "";
     CWD: string = "";
+
+    MainFile: string = "";
 };
 
 class LazProject {
@@ -59,7 +61,7 @@ class LazProject {
         });
     }
 
-    private processFpcOptionStringList(fpcOptions: Array<string>, option: string, options: Array<string>) {
+    public processFpcOptionStringList(fpcOptions: Array<string>, option: string, options: Array<string>) {
 
         options.forEach((p) => {
             fpcOptions.push('"' + option + p + '"');
@@ -105,6 +107,7 @@ class LazProject {
                         lazProjectResult.SyntaxMode = result.CONFIG.CompilerOptions[0].Parsing[0].SyntaxOptions[0].SyntaxMode[0].$.Value;
                         lazProjectResult.Target = this.replaceStringWithEnvVar(result.CONFIG.CompilerOptions[0].Target[0].Filename[0].$.Value);
                         lazProjectResult.CWD = path.dirname(lazProjectResult.Target);
+                        lazProjectResult.MainFile = path.join(path.dirname(project), result.CONFIG.ProjectOptions[0].Units[0].Unit0[0].Filename[0].$.Value);
                     }
                 });
             } catch (error) {
@@ -117,22 +120,6 @@ class LazProject {
         }
 
         return lazProjectResult;
-    }
-
-    public HandleCurrentProject(fpcOptions: Array<string>) {
-
-        // load
-        let project = this.LoadCurrentProjectOptions();
-        if (!project)
-            return;
-
-        // mode
-        fpcOptions.push("-M" + project.SyntaxMode.toLowerCase());
-
-        // options
-        this.processFpcOptionStringList(fpcOptions, '-Fi', project.IncludeFiles);
-        this.processFpcOptionStringList(fpcOptions, '-Fu', project.OtherUnitFiles);
-        this.processFpcOptionStringList(fpcOptions, '', project.CustomOptions);
     }
 
     public getDefaultProjectFpcTaskDefinition(): FpcTaskDefinition | null {
@@ -263,7 +250,7 @@ class LazProject {
             await this.runDefaultBuildTask();
     }
 
-    public async ProjectActivate(workspaceRoot: string, file: string) {
+    public async ProjectActivate(workspaceRoot: string, file: string, label?: string) {
 
         // get tasks
         let matched = false;
@@ -272,7 +259,12 @@ class LazProject {
         for (const task of tasks) {
 
             // match our task
-            if (task.file === file && !matched) {
+            let match = true;
+            if (label) {
+                match = task.label === label;
+            }
+
+            if (task.file === file && match && !matched) {
                 if (typeof (task.group) === 'object') {
                     task.group.isDefault = true;
                 } else {
@@ -297,7 +289,7 @@ class LazProject {
         );
 
         // reload tasks
-        await vscode.commands.executeCommand('workbench.action.tasks.reloadTasks');
+        vscode.commands.executeCommand('workbench.action.tasks.reloadTasks');
 
         // restart LSP
         client.restart();

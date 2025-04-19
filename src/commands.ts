@@ -373,38 +373,7 @@ end.`;
         }
     };
     ProjectSetDefault = async (node: FpcItem) => {
-        let config = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(this.workspaceRoot));
-        let tasks=config.tasks;
-        for (const task of tasks) {
-
-            // match our task
-            if(task.label===node.label && task.file===node.file){
-                if(typeof(task.group)==='object'){
-                    task.group.isDefault=true;
-                }else{
-                    task.group={kind:task.group,isDefault:true};
-                }
-
-            // all other tasks - reset
-            }else{
-                if(typeof(task.group)==='object'){
-                    task.group.isDefault=undefined;
-                }
-            }
-
-
-        }
-
-        await config.update(
-            "tasks",
-            tasks,
-            vscode.ConfigurationTarget.WorkspaceFolder
-        );
-
-        vscode.commands.executeCommand('workbench.action.tasks.reloadTasks');
-
-        // restart LSP
-        client.restart();
+        lazproject.ProjectActivate(this.workspaceRoot, node.file, node.label);
     }
     CodeComplete = async (textEditor: TextEditor, edit: TextEditorEdit) => {
         client.doCodeComplete(textEditor);
