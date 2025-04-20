@@ -161,6 +161,10 @@
       {
         "command": "fpctoolkit.editor.urldecode",
         "title": "%editor.urldecode%"
+      },
+      {
+        "command": "fpctoolkit.editor.generateuuid",
+        "title": "%editor.generateuuid%"
       }
     ],
     "keybindings": [
@@ -188,6 +192,11 @@
         "key": "f2",
         "command": "fpctoolkit.code.rename",
         "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+shift+g",
+        "command": "fpctoolkit.editor.generateuuid",
+        "when": "editorTextFocus && !isInEmbeddedEditor && editorLangId == 'objectpascal'"
       }
     ],
     "taskDefinitions": [

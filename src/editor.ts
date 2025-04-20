@@ -16,6 +16,7 @@ export class EditorCommandManager {
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.hexdecode', this.HexDecode));
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.urlencode', this.URLEncode));
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.urldecode', this.URLDecode));
+        context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.generateuuid', this.GenerateUUID));
     }
 
     TrimFromCursor = async (textEditor: TextEditor, edit: TextEditorEdit) => {
@@ -233,5 +234,24 @@ export class EditorCommandManager {
             return;
         }
         await this.replaceText(editor, range, decoded);
+    };
+
+    // Inserts a random UUID in the format ['{UUID}'] at the current cursor position
+    GenerateUUID = async (textEditor: TextEditor, edit: TextEditorEdit) => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) return;
+        // Generate a random UUID v4
+        function uuidv4() {
+            return 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'.replace(/[x]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                return r.toString(16).toUpperCase();
+            });
+        }
+        const uuid = uuidv4();
+        const formatted = `[\'{${uuid}}\']`;
+        const position = editor.selection.active;
+        await editor.edit(editBuilder => {
+            editBuilder.insert(position, formatted);
+        });
     };
 }

@@ -65,5 +65,6 @@
     "editor.hexencode": "Hex encode",
     "editor.hexdecode": "Hex decode",
     "editor.urlencode": "URL encode",
-    "editor.urldecode": "URL decode"
+    "editor.urldecode": "URL decode",
+    "editor.generateuuid": "Generate UUID"
 }
