@@ -165,6 +165,10 @@
       {
         "command": "fpctoolkit.editor.generateuuid",
         "title": "%editor.generateuuid%"
+      },
+      {
+        "command": "fpctoolkit.editor.quotedprintabledecode",
+        "title": "%editor.quotedprintabledecode%"
       }
     ],
     "keybindings": [

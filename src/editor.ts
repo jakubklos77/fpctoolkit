@@ -17,6 +17,7 @@ export class EditorCommandManager {
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.urlencode', this.URLEncode));
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.urldecode', this.URLDecode));
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.generateuuid', this.GenerateUUID));
+        context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.quotedprintabledecode', this.QuotedPrintableDecode));
     }
 
     TrimFromCursor = async (textEditor: TextEditor, edit: TextEditorEdit) => {
@@ -184,6 +185,7 @@ export class EditorCommandManager {
         if (!editor) return;
 
         const { text, range } = this.getSelectedTextAndRange(editor);
+
         const encoded = Buffer.from(text, 'utf-8').toString('hex');
 
         await this.replaceText(editor, range, encoded);
@@ -212,7 +214,9 @@ export class EditorCommandManager {
     URLEncode = async (textEditor: TextEditor, edit: TextEditorEdit) => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) return;
+
         const { text, range } = this.getSelectedTextAndRange(editor);
+
         let encoded = '';
         try {
             encoded = encodeURIComponent(text);
@@ -226,13 +230,16 @@ export class EditorCommandManager {
     URLDecode = async (textEditor: TextEditor, edit: TextEditorEdit) => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) return;
+
         const { text, range } = this.getSelectedTextAndRange(editor);
+
         let decoded = '';
         try {
             decoded = decodeURIComponent(text);
         } catch (e) {
             return;
         }
+
         await this.replaceText(editor, range, decoded);
     };
 
@@ -254,4 +261,31 @@ export class EditorCommandManager {
             editBuilder.insert(position, formatted);
         });
     };
+
+    // Decodes the current selection or the whole document from quoted-printable encoding (UTF-8 safe) and replaces it
+    QuotedPrintableDecode = async (textEditor: TextEditor, edit: TextEditorEdit) => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) return;
+
+        const { text, range } = this.getSelectedTextAndRange(editor);
+
+        // Remove soft line breaks (= or =\r\n)
+        let qp = text.replace(/=\r?\n/g, '');
+        // Convert to byte array
+        let bytes: number[] = [];
+        let i = 0;
+        while (i < qp.length) {
+            if (qp[i] === '=' && i + 2 < qp.length && /[A-Fa-f0-9]{2}/.test(qp.substr(i + 1, 2))) {
+                bytes.push(parseInt(qp.substr(i + 1, 2), 16));
+                i += 3;
+            } else {
+                bytes.push(qp.charCodeAt(i));
+                i++;
+            }
+        }
+        let decoded = Buffer.from(bytes).toString('utf-8');
+
+        await this.replaceText(editor, range, decoded);
+    };
+
 }
