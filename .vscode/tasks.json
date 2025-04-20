@@ -4,6 +4,12 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"type": "shell",
+			"command": "chmod -R a+r bin/* && npx vsce package -o ~/Downloads/",
+			"problemMatcher": [],
+			"label": "build VSIX package",
+		},
+		{
 			"type": "npm",
 			"script": "watch",
 			"group": "build",
@@ -29,11 +35,6 @@
 			"problemMatcher": [],
 			"label": "npm: esbuild",
 			"detail": "npm run -S esbuild-base -- --sourcemap"
-		},
-		{
-			"type": "shell",
-			"command": "chmod -R a+r bin/* && npx vsce package -o ~/Downloads/",
-			"label": "build VSIX package",
 		},
 	]
 }

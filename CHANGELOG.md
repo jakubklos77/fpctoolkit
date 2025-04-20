@@ -1,4 +1,6 @@
 ## [1.2.5] - 2025-04-15
+## add:
+- fpctoolkit.project.rebuild can be called with a shortcut (Shift+F9) - does not need a need to be called from
 ## fix:
 - activate project - reloadTasks no longer work (used async call), client reloaded now
 - refactor rename - support for all units

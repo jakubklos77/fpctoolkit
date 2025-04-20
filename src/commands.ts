@@ -98,13 +98,26 @@ export class FpcCommandManager {
     };
     ProjectBuildInternal = async (node: FpcItem, rebuild: boolean = false) => {
 
+        // Get task label
+        let taskLabel = '';
+
+        // Node known
+        if (node) {
+            taskLabel = node.label;
+
+        // No node - use the current project
+        } else {
+            let task = lazproject.getDefaultProjectFpcTaskDefinition();
+            if (task)
+                taskLabel = task.label;
+        }
+
         vscode.tasks.fetchTasks({ type: 'fpc' }).then((e) => {
             e.forEach((task) => {
-                //vscode.window.showInformationMessage(task.name);
-                if (task.name === node.label) {
+                if (task.name === taskLabel) {
                     let newtask=taskProvider.taskMap.get(task.name);
                     if(newtask){
-                        if (!node.forceRebuild && !rebuild) {
+                        if (!node?.forceRebuild && !rebuild) {
                             (newtask as FpcTask).BuildMode=BuildMode.normal;
                         } else {
                             (newtask as FpcTask).BuildMode=BuildMode.rebuild;
@@ -126,7 +139,6 @@ export class FpcCommandManager {
     };
     ProjectReBuild = async (node: FpcItem) => {
 
-        await this.ProjectClean(node);
         this.ProjectBuildInternal(node, true);
 
     };
