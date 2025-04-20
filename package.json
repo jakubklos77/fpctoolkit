@@ -31,10 +31,7 @@
     "url": "https://github.com/jakubklos77/fpctoolkit/issues"
   },
   "activationEvents": [
-    "onView:FpcProjectExplorer",
-    "onLanguage:objectpascal",
-    "onCommand:fpctoolkit.code.rename",
-    "onCommand:fpctoolkit.editor.trimfromcursor"
+    "onCommand:fpctoolkit.code.rename"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -132,6 +129,24 @@
       {
         "command": "fpctoolkit.project.setdefault",
         "title": "%project.setdefault%"
+      },
+
+
+      {
+        "command": "fpctoolkit.editor.trimfromcursor",
+        "title": "%editor.trimfromcursor%"
+      },
+      {
+        "command": "fpctoolkit.code.complete",
+        "title": "%code.complete%"
+      },
+      {
+        "command": "fpctoolkit.editor.base64encode",
+        "title": "%editor.base64encode%"
+      },
+      {
+        "command": "fpctoolkit.editor.base64decode",
+        "title": "%editor.base64decode%"
       }
     ],
     "keybindings": [
