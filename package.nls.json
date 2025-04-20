@@ -61,5 +61,9 @@
 
     "editor.trimfromcursor": "Delete to end of word",
     "editor.base64encode": "Base64 encode",
-    "editor.base64decode": "Base64 decode"
+    "editor.base64decode": "Base64 decode",
+    "editor.hexencode": "Hex encode",
+    "editor.hexdecode": "Hex decode",
+    "editor.urlencode": "URL encode",
+    "editor.urldecode": "URL decode"
 }

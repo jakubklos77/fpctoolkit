@@ -12,6 +12,10 @@ export class EditorCommandManager {
 
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.base64encode', this.Base64Encode));
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.base64decode', this.Base64Decode));
+        context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.hexencode', this.HexEncode));
+        context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.hexdecode', this.HexDecode));
+        context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.urlencode', this.URLEncode));
+        context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.urldecode', this.URLDecode));
     }
 
     TrimFromCursor = async (textEditor: TextEditor, edit: TextEditorEdit) => {
@@ -167,10 +171,67 @@ export class EditorCommandManager {
         try {
             decoded = Buffer.from(base64, 'base64').toString('utf-8');
         } catch (e) {
-            vscode.window.showErrorMessage('Base64 decode failed: ' + (e instanceof Error ? e.message : e));
             return;
         }
 
+        await this.replaceText(editor, range, decoded);
+    };
+
+    // Encodes the current selection or the whole document to hex and replaces it
+    HexEncode = async (textEditor: TextEditor, edit: TextEditorEdit) => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) return;
+
+        const { text, range } = this.getSelectedTextAndRange(editor);
+        const encoded = Buffer.from(text, 'utf-8').toString('hex');
+
+        await this.replaceText(editor, range, encoded);
+    };
+
+    // Decodes the current selection or the whole document from hex and replaces it
+    HexDecode = async (textEditor: TextEditor, edit: TextEditorEdit) => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) return;
+
+        const { text, range } = this.getSelectedTextAndRange(editor);
+
+        // Remove all whitespace and newlines
+        let hex = text.replace(/\s+/g, '');
+        let decoded = '';
+        try {
+            decoded = Buffer.from(hex, 'hex').toString('utf-8');
+        } catch (e) {
+            return;
+        }
+
+        await this.replaceText(editor, range, decoded);
+    };
+
+    // Encodes the current selection or the whole document as a URL component and replaces it
+    URLEncode = async (textEditor: TextEditor, edit: TextEditorEdit) => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) return;
+        const { text, range } = this.getSelectedTextAndRange(editor);
+        let encoded = '';
+        try {
+            encoded = encodeURIComponent(text);
+        } catch (e) {
+            return;
+        }
+        await this.replaceText(editor, range, encoded);
+    };
+
+    // Decodes the current selection or the whole document from a URL component and replaces it
+    URLDecode = async (textEditor: TextEditor, edit: TextEditorEdit) => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) return;
+        const { text, range } = this.getSelectedTextAndRange(editor);
+        let decoded = '';
+        try {
+            decoded = decodeURIComponent(text);
+        } catch (e) {
+            return;
+        }
         await this.replaceText(editor, range, decoded);
     };
 }

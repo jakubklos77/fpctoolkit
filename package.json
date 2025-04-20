@@ -130,8 +130,6 @@
         "command": "fpctoolkit.project.setdefault",
         "title": "%project.setdefault%"
       },
-
-
       {
         "command": "fpctoolkit.editor.trimfromcursor",
         "title": "%editor.trimfromcursor%"
@@ -147,6 +145,22 @@
       {
         "command": "fpctoolkit.editor.base64decode",
         "title": "%editor.base64decode%"
+      },
+      {
+        "command": "fpctoolkit.editor.hexencode",
+        "title": "%editor.hexencode%"
+      },
+      {
+        "command": "fpctoolkit.editor.hexdecode",
+        "title": "%editor.hexdecode%"
+      },
+      {
+        "command": "fpctoolkit.editor.urlencode",
+        "title": "%editor.urlencode%"
+      },
+      {
+        "command": "fpctoolkit.editor.urldecode",
+        "title": "%editor.urldecode%"
       }
     ],
     "keybindings": [
