@@ -6,6 +6,8 @@
 ## fix:
 - activate project - reloadTasks no longer work (used async call), client reloaded now
 - refactor rename - support for all units
+- references - support for all units
+- fpctoolkit.code.rename - does not await (first issues rename then SaveAll), fixes the focus vs Home issue...
 
 ## [1.2.4] - 2025-04-15
 ## fix:

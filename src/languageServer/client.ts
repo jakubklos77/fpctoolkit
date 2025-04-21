@@ -482,11 +482,11 @@ export class TLangClient implements ErrorHandler {
 
     async doCodeRename(editor: vscode.TextEditor): Promise<void> {
 
-        // save
-        await vscode.workspace.saveAll();
-
         // rename
-        await vscode.commands.executeCommand('editor.action.rename');
+        vscode.commands.executeCommand('editor.action.rename');
+
+        // save
+        vscode.workspace.saveAll();
     }
 
     async getUnitPath(unitnames: string[]): Promise<string[]> {
