@@ -1,4 +1,4 @@
-## [1.2.5] - 2025-04-15
+## [1.2.5] - 2025-04-22
 ## add:
 - fpctoolkit.project.rebuild can be called with a shortcut (Shift+F9) - does not need a need to be called from
 - editor commands (fpctoolkit.editor.): base64encode, base64decode, hexencode, hexdecode, urlencode, urldecode, quoted-printable decode
