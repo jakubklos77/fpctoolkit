@@ -260,7 +260,103 @@ class LazProject {
             await this.runDefaultBuildTask();
     }
 
-    public async ProjectActivate(workspaceRoot: string, file: string, label?: string) {
+    public async promptToSaveAllIfDirty(): Promise<boolean> {
+        const dirtyEditors = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
+        if (dirtyEditors.length > 0) {
+            const save = await vscode.window.showWarningMessage(
+                'There are unsaved files. Do you want to save all before switching projects?',
+                { modal: true },
+                'Save All', 'Cancel'
+            );
+            if (save === 'Save All') {
+                await vscode.workspace.saveAll();
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public async saveEditorStateByKey(key: string, context: vscode.ExtensionContext) {
+
+        const allTabs = ([] as vscode.Tab[]).concat(...vscode.window.tabGroups.all.map(group => group.tabs));
+        const activeTab = allTabs.find(tab => tab.isActive);
+
+        const state = allTabs.map(tab => {
+            let uri: string | undefined;
+            if (tab.input && (tab.input as any).uri) {
+                uri = (tab.input as any).uri.toString();
+            }
+            if (!uri)
+                return undefined;
+
+            // Try to find a visible editor for this tab
+            const editor = vscode.window.visibleTextEditors.find(e => e.document.uri.toString() === uri);
+            return {
+                uri,
+                selection: editor ? {
+                    start: editor.selection.start,
+                    end: editor.selection.end
+                } : undefined,
+                visibleRange: editor && editor.visibleRanges[0] ? {
+                    start: editor.visibleRanges[0].start,
+                    end: editor.visibleRanges[0].end
+                } : undefined,
+                isActive: activeTab && uri === ((activeTab.input as any)?.uri?.toString())
+            };
+        }).filter(Boolean);
+        await context.globalState.update(`editorState:${key}`, state);
+    }
+
+    public async restoreEditorStateByKey(key: string, context: vscode.ExtensionContext) {
+        const state = context.globalState.get<any[]>(`editorState:${key}`);
+        if (!state)
+            return;
+
+        // Close all open editors
+        await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+        let activeToRestore: any = undefined;
+
+        for (const entry of state) {
+            const doc = await vscode.workspace.openTextDocument(vscode.Uri.parse(entry.uri));
+            const editor = await vscode.window.showTextDocument(doc, { preview: false, preserveFocus: !entry.isActive });
+            if (entry.selection) {
+                editor.selection = new vscode.Selection(
+                    new vscode.Position(entry.selection.start.line, entry.selection.start.character),
+                    new vscode.Position(entry.selection.end.line, entry.selection.end.character)
+                );
+            }
+            if (entry.visibleRange) {
+                editor.revealRange(
+                    new vscode.Range(
+                        new vscode.Position(entry.visibleRange.start.line, entry.visibleRange.start.character),
+                        new vscode.Position(entry.visibleRange.end.line, entry.visibleRange.end.character)
+                    ),
+                    vscode.TextEditorRevealType.AtTop
+                );
+            }
+            if (entry.isActive) {
+                activeToRestore = editor;
+            }
+        }
+
+        // Ensure the active editor is focused
+        if (activeToRestore) {
+            await vscode.window.showTextDocument(activeToRestore.document, { preview: false, preserveFocus: false });
+        }
+    }
+
+    public async ProjectActivate(workspaceRoot: string, file: string, label: string, context: vscode.ExtensionContext) {
+
+        // Prompt to save all if dirty
+        if (!(await this.promptToSaveAllIfDirty())) {
+            return;
+        }
+
+        // Save editor state for the current project
+        let task = this.getProjectFpcTaskDefinition();
+        if (task && task.file)
+            await this.saveEditorStateByKey(task.file, context);
 
         // get tasks
         let matched = false;
@@ -304,6 +400,8 @@ class LazProject {
         // restart LSP
         client.restart();
 
+        // Restore editor state if exists
+        await this.restoreEditorStateByKey(file, context);
     }
 }
 

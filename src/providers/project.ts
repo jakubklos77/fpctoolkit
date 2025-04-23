@@ -225,33 +225,14 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 
 	private async OpenProject(selection: FpcItem) {
 
-		// Init
-		const now = Date.now();
-		const DOUBLE_CLICK_THRESHOLD = 300; // ms
-		let isDoubleClick = false;
+		let taskfile = vscode.Uri.file(path.join(this.workspaceRoot, '.vscode', 'tasks.json'))
 
-		// Double-click detection
-		if (this.lastOpenProjectElement === selection && now - this.lastOpenProjectClickTime < DOUBLE_CLICK_THRESHOLD)
-			isDoubleClick = true;
-
-		// Mark new
-		this.lastOpenProjectClickTime = now;
-		this.lastOpenProjectElement = selection;
-
-		if (!isDoubleClick) {
-			let taskfile = vscode.Uri.file(path.join(this.workspaceRoot, '.vscode', 'tasks.json'))
-
-			fs.existsSync(taskfile.fsPath)
-			{
-				const document: vscode.TextDocument = await vscode.workspace.openTextDocument(taskfile);
-				const offset = this.findJsonDocumentPosition(document.getText(), selection);
-				const position = document.positionAt(offset);
-				await vscode.window.showTextDocument(document, { selection: new vscode.Selection(position, position) });
-			}
-		} else {
-
-			// Activate
-			lazproject.ProjectActivate(this.workspaceRoot, selection.file);
+		fs.existsSync(taskfile.fsPath)
+		{
+			const document: vscode.TextDocument = await vscode.workspace.openTextDocument(taskfile);
+			const offset = this.findJsonDocumentPosition(document.getText(), selection);
+			const position = document.positionAt(offset);
+			await vscode.window.showTextDocument(document, { selection: new vscode.Selection(position, position) });
 		}
 	}
 

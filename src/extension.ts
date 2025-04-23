@@ -30,8 +30,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	const workspaceRoot = vscode.workspace.workspaceFolders[0].uri.fsPath;
 
 
-	let commands = new FpcCommandManager(workspaceRoot);
-	commands.registerAll(context);
+	let commands = new FpcCommandManager(workspaceRoot, context);
+	commands.registerAll();
 
 	formatter = new JediFormatter();
 	formatter.doInit();

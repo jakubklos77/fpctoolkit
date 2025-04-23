@@ -15,10 +15,15 @@ import { TextEditor, TextEditorEdit } from 'vscode';
 
 export class FpcCommandManager {
 
-    constructor(private workspaceRoot: string) {
+    private context: vscode.ExtensionContext;
 
+    constructor(private workspaceRoot: string, context: vscode.ExtensionContext) {
+        this.context = context;
     }
-    registerAll(context: vscode.ExtensionContext) {
+
+    registerAll() {
+        let context = this.context;
+
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.build', this.ProjectBuild));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.rebuild', this.ProjectReBuild));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.project.clean', this.ProjectClean));
@@ -32,7 +37,7 @@ export class FpcCommandManager {
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.program', this.GetProgram));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.checkforrebuild', this.CheckForRebuild));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.launchargs', this.GetLaunchArgs));
-        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.mainfile', this.MainFile));
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.mainfile', this.ShowMainFile));
 
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.complete',this.CodeComplete));
 
@@ -204,7 +209,7 @@ export class FpcCommandManager {
         return args;
     };
 
-    MainFile = async (node?: FpcItem) => {
+    ShowMainFile = async (node?: FpcItem) => {
 
         let project = lazproject.LoadProjectOptions(node?.file);
         if (!project)
@@ -223,7 +228,7 @@ export class FpcCommandManager {
         if (!file)
             return;
 
-        lazproject.ProjectActivate(this.workspaceRoot, file);
+        lazproject.ProjectActivate(this.workspaceRoot, file, "", this.context);
     };
 
     ProjectNew = async () => {
@@ -339,7 +344,7 @@ end.`;
     };
 
     ProjectSetDefault = async (node: FpcItem) => {
-        lazproject.ProjectActivate(this.workspaceRoot, node.file, node.label);
+        lazproject.ProjectActivate(this.workspaceRoot, node.file, node.label, this.context);
     }
 
     CodeComplete = async (textEditor: TextEditor, edit: TextEditorEdit) => {

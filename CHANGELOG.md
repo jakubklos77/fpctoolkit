@@ -1,8 +1,9 @@
 ## [1.2.6] - 2025-04-23
 ## add:
-- Context menu - Main source support
-- lpi HostApplication support added
-- cwd support for Target if local or MainFile
+- FPC project - project files (tabs, positions) saved and restored on project activation
+- Context menu - "Main source" support
+- .lpi HostApplication support added
+- "cwd" support for Target if local or MainFile
 
 ## [1.2.5] - 2025-04-22
 ## add:
