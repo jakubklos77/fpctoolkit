@@ -163,6 +163,10 @@ export class FpcCommandManager {
         let project = lazproject.LoadCurrentProjectOptions();
         if (!project)
             return "";
+
+        if (project.HostApplication)
+            return project.HostApplication;
+
         return project.Target;
     };
     GetCWD = async (node?: FpcItem) => {
@@ -170,11 +174,24 @@ export class FpcCommandManager {
         let project = lazproject.LoadCurrentProjectOptions();
         if (!project)
             return "";
-        return project.CWD;
+
+        if (project.HostApplication)
+            return path.dirname(project.HostApplication);
+
+        let cwd = project.CWD;
+        if (cwd === '' || cwd === '.') {
+            cwd = path.dirname(project.Target);
+        }
+        if (cwd === '' || cwd === '.') {
+            cwd = path.dirname(project.MainFile);
+        }
+
+        return cwd;
     };
     GetLaunchArgs = async (node?: FpcItem) => {
 
-        return lazproject.GetProjectArgs() ;
+        let args = lazproject.GetProjectArgs()
+        return args;
     };
     ProjectActivate = async (node?: FpcItem) => {
 

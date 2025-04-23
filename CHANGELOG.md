@@ -1,3 +1,8 @@
+## [1.2.6] - 2025-04-23
+## add:
+- lpi HostApplication support added
+- cwd support for Target if local or MainFile
+
 ## [1.2.5] - 2025-04-22
 ## add:
 - fpctoolkit.project.rebuild can be called with a shortcut (Shift+F9) - does not need a need to be called from

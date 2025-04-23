@@ -20,6 +20,7 @@ export class LazProjectOptions {
     CWD: string = "";
 
     MainFile: string = "";
+    HostApplication: string = "";
 };
 
 class LazProject {
@@ -108,6 +109,7 @@ class LazProject {
                         lazProjectResult.Target = this.replaceStringWithEnvVar(result.CONFIG.CompilerOptions[0].Target[0].Filename[0].$.Value);
                         lazProjectResult.CWD = path.dirname(lazProjectResult.Target);
                         lazProjectResult.MainFile = path.join(path.dirname(project), result.CONFIG.ProjectOptions[0].Units[0].Unit0[0].Filename[0].$.Value);
+                        lazProjectResult.HostApplication = result.CONFIG.ProjectOptions[0].RunParams?.[0].local?.[0].HostApplicationFilename?.[0].$.Value;
                     }
                 });
             } catch (error) {
@@ -158,7 +160,7 @@ class LazProject {
         return null;
     }
 
-    public async GetProjectArgs(): Promise<string> {
+    public GetProjectArgs(): string {
 
         let task = this.getDefaultProjectFpcTaskDefinition();
         return task?.launchArgs ?? '';
