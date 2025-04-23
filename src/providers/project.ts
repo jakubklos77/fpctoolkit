@@ -91,7 +91,6 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 
 	getChildren(element?: FpcItem | undefined): vscode.ProviderResult<FpcItem[]> {
 
-
 		if (element) {
 			this.defaultFtpItem=undefined;
 			let items: FpcItem[] = [];
@@ -291,18 +290,5 @@ export class FpcItem extends vscode.TreeItem {
 
 		this.iconPath=this.level? new vscode.ThemeIcon('wrench'):path.join(__filename, '..','..',  'images','pascal-project.png');
 
-		//https://code.visualstudio.com/api/references/icons-in-labels
-
-		//this.command!.command= "workbench.action.tasks.configureTaskRunner";
-		//this.command!.arguments?.push(this.id);
-
 	}
-
-
-	// iconPath = {
-	// 	light: this.level?'$(gripper)':path.join(__filename, '..','..',  'images', this.level ? 'build.png' : 'pascal-project.png'),
-	// 	dark: path.join(__filename, '..','..',  'images', this.label ? 'build.png' : 'pascal-project.png')
-	// };
-
-
 }
