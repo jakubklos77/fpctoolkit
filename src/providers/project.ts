@@ -153,7 +153,7 @@ export class FpcProjectProvider implements vscode.TreeDataProvider<FpcItem> {
 	GetDefaultProjectCompileOption(): CompileOption  {
 
 		let opt: CompileOption|undefined=undefined;
-		let taskDef = lazproject.getDefaultProjectFpcTaskDefinition();
+		let taskDef = lazproject.getProjectFpcTaskDefinition();
 
 		if (taskDef) {
 			opt = new CompileOption(taskDef, this.workspaceRoot);

@@ -7,6 +7,7 @@
     "project.setdefault": "Set as default",
     "code.complete": "Complete the code",
     "currentproject.activate": "Activate project",
+    "currentproject.mainfile": "Main source",
     "currentproject.checkforrebuild": "Check for rebuild",
     "currentproject.program": "Get program",
     "currentproject.cwd": "Get cwd",

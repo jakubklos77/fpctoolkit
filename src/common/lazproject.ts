@@ -69,12 +69,12 @@ class LazProject {
         });
     }
 
-    public LoadCurrentProjectOptions(): LazProjectOptions | null {
+    public LoadProjectOptions(file?: string): LazProjectOptions | null {
 
         let lazProjectResult: LazProjectOptions | null = null;
 
         // get project
-        let task = this.getDefaultProjectFpcTaskDefinition();
+        let task = this.getProjectFpcTaskDefinition(file);
         if (task && task.file) {
             // check if relative path
             let project = task.file;
@@ -124,7 +124,7 @@ class LazProject {
         return lazProjectResult;
     }
 
-    public getDefaultProjectFpcTaskDefinition(): FpcTaskDefinition | null {
+    public getProjectFpcTaskDefinition(file?: string): FpcTaskDefinition | null {
 
         if (!vscode.workspace.workspaceFolders)
             return null;
@@ -139,7 +139,15 @@ class LazProject {
         if (cfg?.tasks != undefined) {
             for (const e of cfg?.tasks) {
                 if (e.type === 'fpc') {
-                    if (e.group?.isDefault) {
+
+                    let match = false;
+
+                    if (file)
+                        match = e.file === file;
+                    else
+                        match = e.group?.isDefault
+
+                    if (match) {
 
                         // create if default
                         result = new FpcTaskDefinition();
@@ -162,7 +170,7 @@ class LazProject {
 
     public GetProjectArgs(): string {
 
-        let task = this.getDefaultProjectFpcTaskDefinition();
+        let task = this.getProjectFpcTaskDefinition();
         return task?.launchArgs ?? '';
     }
 
@@ -239,7 +247,7 @@ class LazProject {
     public async CheckBeforeBuild() {
 
         // load
-        let project = this.LoadCurrentProjectOptions();
+        let project = this.LoadProjectOptions();
         if (!project)
             return;
 

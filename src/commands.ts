@@ -32,6 +32,7 @@ export class FpcCommandManager {
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.program', this.GetProgram));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.checkforrebuild', this.CheckForRebuild));
         context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.launchargs', this.GetLaunchArgs));
+        context.subscriptions.push(vscode.commands.registerCommand('fpctoolkit.currentproject.mainfile', this.MainFile));
 
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.code.complete',this.CodeComplete));
 
@@ -42,6 +43,7 @@ export class FpcCommandManager {
         let commands = new EditorCommandManager();
         commands.registerAll(context);
     }
+
     ProjectAdd = async (node: FpcItem) => {
         if (node.level === 0) {
             let config = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(this.workspaceRoot));
@@ -100,6 +102,7 @@ export class FpcCommandManager {
         }
 
     };
+
     ProjectBuildInternal = async (node: FpcItem, rebuild: boolean = false) => {
 
         // Get task label
@@ -111,7 +114,7 @@ export class FpcCommandManager {
 
         // No node - use the current project
         } else {
-            let task = lazproject.getDefaultProjectFpcTaskDefinition();
+            let task = lazproject.getProjectFpcTaskDefinition();
             if (task)
                 taskLabel = task.label;
         }
@@ -136,16 +139,19 @@ export class FpcCommandManager {
         });
 
     };
+
     ProjectBuild = async (node: FpcItem) => {
 
         this.ProjectBuildInternal(node);
 
     };
+
     ProjectReBuild = async (node: FpcItem) => {
 
         this.ProjectBuildInternal(node, true);
 
     };
+
     ProjectOpen = async (node?: FpcItem) => {
 
         let file = path.join(this.workspaceRoot, ".vscode", "tasks.json");
@@ -153,14 +159,16 @@ export class FpcCommandManager {
         let te = await vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
 
     };
+
     CheckForRebuild = async (node?: FpcItem) => {
 
         await lazproject.CheckBeforeBuild();
         return "";
     };
+
     GetProgram = async (node?: FpcItem) => {
 
-        let project = lazproject.LoadCurrentProjectOptions();
+        let project = lazproject.LoadProjectOptions();
         if (!project)
             return "";
 
@@ -169,9 +177,10 @@ export class FpcCommandManager {
 
         return project.Target;
     };
+
     GetCWD = async (node?: FpcItem) => {
 
-        let project = lazproject.LoadCurrentProjectOptions();
+        let project = lazproject.LoadProjectOptions();
         if (!project)
             return "";
 
@@ -188,11 +197,25 @@ export class FpcCommandManager {
 
         return cwd;
     };
+
     GetLaunchArgs = async (node?: FpcItem) => {
 
         let args = lazproject.GetProjectArgs()
         return args;
     };
+
+    MainFile = async (node?: FpcItem) => {
+
+        let project = lazproject.LoadProjectOptions(node?.file);
+        if (!project)
+            return;
+
+        // Show main file
+        const file = vscode.Uri.file(project.MainFile);
+        const doc = await vscode.workspace.openTextDocument(file);
+        vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
+    };
+
     ProjectActivate = async (node?: FpcItem) => {
 
         // get node file
@@ -202,6 +225,7 @@ export class FpcCommandManager {
 
         lazproject.ProjectActivate(this.workspaceRoot, file);
     };
+
     ProjectNew = async () => {
 
         let s = `program main;
@@ -259,6 +283,7 @@ end.`;
         );
 
     };
+
     ProjectClean = async (node: FpcItem) => {
 
         let definition = taskProvider.GetTaskDefinition(node.label);
@@ -312,13 +337,16 @@ end.`;
             }
         }
     };
+
     ProjectSetDefault = async (node: FpcItem) => {
         lazproject.ProjectActivate(this.workspaceRoot, node.file, node.label);
     }
+
     CodeComplete = async (textEditor: TextEditor, edit: TextEditorEdit) => {
         client.doCodeComplete(textEditor);
 
     }
+
     CodeRename = async (textEditor: TextEditor, edit: TextEditorEdit) => {
         client.doCodeRename(textEditor);
     }

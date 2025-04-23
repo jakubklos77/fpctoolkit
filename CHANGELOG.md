@@ -1,5 +1,6 @@
 ## [1.2.6] - 2025-04-23
 ## add:
+- Context menu - Main source support
 - lpi HostApplication support added
 - cwd support for Target if local or MainFile
 

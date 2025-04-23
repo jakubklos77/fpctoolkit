@@ -228,7 +228,7 @@ export class InitializationOptions {
     public HandleCurrentProject(fpcOptions: Array<string>) {
 
         // load
-        let project = lazproject.LoadCurrentProjectOptions();
+        let project = lazproject.LoadProjectOptions();
         if (!project)
             return;
 

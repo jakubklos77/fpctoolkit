@@ -115,6 +115,10 @@
         "title": "%currentproject.activate%"
       },
       {
+        "command": "fpctoolkit.currentproject.mainfile",
+        "title": "%currentproject.mainfile%"
+      },
+      {
         "command": "fpctoolkit.currentproject.checkforrebuild",
         "title": "%currentproject.checkforrebuild%"
       },
@@ -397,6 +401,11 @@
         },
         {
           "command": "fpctoolkit.currentproject.activate",
+          "when": "view == FpcProjectExplorer && viewItem==fpcproject",
+          "group": "fpcproject@3"
+        },
+        {
+          "command": "fpctoolkit.currentproject.mainfile",
           "when": "view == FpcProjectExplorer && viewItem==fpcproject",
           "group": "fpcproject@4"
         }
