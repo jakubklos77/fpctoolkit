@@ -199,7 +199,7 @@
       {
         "key": "f2",
         "command": "fpctoolkit.code.rename",
-        "when": "editorTextFocus"
+        "when": "editorHasRenameProvider && editorTextFocus && !editorReadonly"
       },
       {
         "key": "ctrl+shift+g",

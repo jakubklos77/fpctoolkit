@@ -1,4 +1,4 @@
-## [1.2.6] - 2025-04-23
+## [1.2.6] - 2025-04-28
 ## add:
 - FPC project - project files (tabs, positions) saved and restored on project activation
 - Context menu - "Main source" support
