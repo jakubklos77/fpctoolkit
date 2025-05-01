@@ -327,7 +327,6 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 
 		// The terminal has been closed. Shutdown the build.
 		diagCollection.clear();
-		let has_error: boolean = false;
 		for (const key of units) {
 			let item = this.diagMaps[key];
 			let uri: vscode.Uri | undefined = undefined;
@@ -354,16 +353,10 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 			} else {
 				diagCollection.set(vscode.Uri.file(key), item);
 			}
-			if (!has_error) {
-				item.forEach((d) => {
-					if (d.severity === DiagnosticSeverity.Error) {
-						has_error = true;
-					}
-				});
-			}
 		}
 
-		if (has_error) {
+		// Focus if any problems
+		if (units.length > 0) {
 			vscode.commands.executeCommand('workbench.actions.view.problems');
 		}
 	}
