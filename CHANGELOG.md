@@ -1,3 +1,7 @@
+## [1.2.7] - 2025-04-30
+## fix:
+- Rename vs unsaved document fixed
+
 ## [1.2.6] - 2025-04-28
 ## add:
 - FPC project - project files (tabs, positions) saved and restored on project activation
