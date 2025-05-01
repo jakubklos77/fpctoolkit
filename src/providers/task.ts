@@ -296,27 +296,18 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 	protected buffer: string = "";
 	protected errbuf: string = "";
 
-	private diagMaps: Map<string, vscode.Diagnostic[]>;
+	// Changed from Map to hash object and order array
+	private diagMaps: { [key: string]: vscode.Diagnostic[] } = {};
+	private diagOrder: string[] = [];
 	public args: string[] = [];
 
 	constructor(private cwd: string, private fpcpath: string) {
-		this.diagMaps = new Map<string, vscode.Diagnostic[]>();
 		this.onDidClose((e) => {
 			//vscode.window.showInformationMessage('onDidClose');
 		});
 	}
 	code: number | undefined;
 
-	// private static inst?: FpcBuildTaskTerminal;
-	// static getInstance(workspaceRoot?: string, fpcpath?: string): FpcBuildTaskTerminal {
-	// 	if (FpcBuildTaskTerminal.inst) {
-	// 		return FpcBuildTaskTerminal.inst;
-	// 	} else {
-	// 		FpcBuildTaskTerminal.inst = new FpcBuildTaskTerminal(workspaceRoot!, fpcpath!);
-	// 		return FpcBuildTaskTerminal.inst;
-	// 	}
-
-	// }
 	clear() {
 
 	}
@@ -332,14 +323,13 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 
 
 	async buildend() {
-		let units = Array.from(this.diagMaps.keys());
+		let units = this.diagOrder;
 
 		// The terminal has been closed. Shutdown the build.
 		diagCollection.clear();
 		let has_error: boolean = false;
-		for (const iter of this.diagMaps) {
-			let key = iter[0];
-			let item = iter[1];
+		for (const key of units) {
+			let item = this.diagMaps[key];
 			let uri: vscode.Uri | undefined = undefined;
 			if (fs.existsSync(key)) {
 				uri = vscode.Uri.file(key);
@@ -352,7 +342,6 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 					return;
 				}
 				let unitpath = unitpaths[0];
-				//let uri:vscode.Uri|undefined=vscode.Uri.file(unitpath);
 				if (unitpath == '') {
 					uri = this.findFile(key)!;
 				} else {
@@ -366,7 +355,6 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 				diagCollection.set(vscode.Uri.file(key), item);
 			}
 			if (!has_error) {
-
 				item.forEach((d) => {
 					if (d.severity === 0) {
 						has_error = true;
@@ -408,7 +396,8 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 
 			this.buffer = "";
 			this.errbuf = "";
-			this.diagMaps.clear();
+			this.diagMaps = {};
+			this.diagOrder = [];
 			if(this.event_before_build){
 				this.event_before_build();
 			}
@@ -428,9 +417,6 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 				}
 				//This is a exitcode,not zero meens failure.
 				if (code!=0) {
-
-					// Focus problems
-					vscode.commands.executeCommand('workbench.actions.focusProblems');
 
 					// Select the first
 					vscode.commands.executeCommand('list.select');
@@ -459,9 +445,6 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 			this.onOutput(this.buffer.substr(0, end));
 			this.buffer = this.buffer.substr(end + 1);
 		}
-		// if (this.buffer.length) {
-		// 	this.emit(this.buffer);
-		// }
 	}
 
 	stderr(data: any) {
@@ -491,14 +474,11 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 	}
 	onOutput(lines: string) {
 		let ls = <string[]>lines.split('\n');
-		let cur_file = "";
 		let reg = /^([\w\/\.]+\.(dpr|p|pp|pas))\((\d+),(\d+)\)\s((Fatal|Error|Warning|Note|Hint):\s\((\w+)\) (.*))/
 		ls.forEach(line => {
-
+			// Regex match
 			let matchs = reg.exec(line);
-
 			if (matchs) {
-
 				let ln = Number(matchs[3]);
 				let col = Number(matchs[4]);
 				let file = matchs[1];
@@ -514,20 +494,19 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 				diag.code = Number.parseInt(msgcode);
 
 				let basename = file;
-				if (this.diagMaps?.has(basename)) {
-					this.diagMaps.get(basename)?.push(diag);
+				if (this.diagMaps[basename]) {
+					this.diagMaps[basename].push(diag);
 				} else {
-					this.diagMaps.set(basename, [diag]);
+					this.diagMaps[basename] = [diag];
+					this.diagOrder.push(basename);
 				}
 				if (diag.severity == DiagnosticSeverity.Error) {
 					this.emit(TerminalEscape.apply({ msg: line, style: [TE_Style.Red] }));
 				} else {
 					this.emit(TerminalEscape.apply({ msg: line, style: [TE_Style.Cyan] }));
 				}
-
-			} else if (line.startsWith('Error:') || line.startsWith('Fatal:')) { //Fatal|Error|Warning|Note
+			} else if (line.startsWith('Error:') || line.startsWith('Fatal:')) { //Fatal|Error|Note
 				this.emit(TerminalEscape.apply({ msg: line, style: [TE_Style.Red] }));
-
 			} else if (line.startsWith('Warning:')) {
 				this.emit(TerminalEscape.apply({ msg: line, style: [TE_Style.BrightYellow] }));
 			}
