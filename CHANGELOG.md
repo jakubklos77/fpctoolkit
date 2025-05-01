@@ -1,6 +1,9 @@
 ## [1.2.7] - 2025-04-30
+## add:
+- FPC Error 5088 handled as a Warning not to hide the primary error
 ## fix:
 - Rename vs unsaved document fixed
+- Problem match - order of units preserved
 
 ## [1.2.6] - 2025-04-28
 ## add:

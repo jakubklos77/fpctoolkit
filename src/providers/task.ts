@@ -356,7 +356,7 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 			}
 			if (!has_error) {
 				item.forEach((d) => {
-					if (d.severity === 0) {
+					if (d.severity === DiagnosticSeverity.Error) {
 						has_error = true;
 					}
 				});
@@ -479,6 +479,8 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 			// Regex match
 			let matchs = reg.exec(line);
 			if (matchs) {
+
+				// Parse
 				let ln = Number(matchs[3]);
 				let col = Number(matchs[4]);
 				let file = matchs[1];
@@ -486,6 +488,7 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 				let msgcode = matchs[7];
 				let msg = matchs[8];
 
+				// Create
 				let diag = new vscode.Diagnostic(
 					new vscode.Range(new vscode.Position(ln - 1, col - 1), new vscode.Position(ln - 1, col - 1)),
 					level + ': ' + msg,
@@ -493,6 +496,20 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 				);
 				diag.code = Number.parseInt(msgcode);
 
+				// Emit to terminal
+				if (diag.severity == DiagnosticSeverity.Error) {
+					this.emit(TerminalEscape.apply({ msg: line, style: [TE_Style.Red] }));
+				} else {
+					this.emit(TerminalEscape.apply({ msg: line, style: [TE_Style.Cyan] }));
+				}
+
+				// Special error 5088 handling - "Error: Found declaration" - this is a secondary error with a lower line position so VSCode prioritizes it and hides the primary error
+				if (diag.code == 5088) {
+					// Set the Warning severity
+					diag.severity = DiagnosticSeverity.Warning;
+				}
+
+				// Add to diags
 				let basename = file;
 				if (this.diagMaps[basename]) {
 					this.diagMaps[basename].push(diag);
@@ -500,11 +517,7 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 					this.diagMaps[basename] = [diag];
 					this.diagOrder.push(basename);
 				}
-				if (diag.severity == DiagnosticSeverity.Error) {
-					this.emit(TerminalEscape.apply({ msg: line, style: [TE_Style.Red] }));
-				} else {
-					this.emit(TerminalEscape.apply({ msg: line, style: [TE_Style.Cyan] }));
-				}
+
 			} else if (line.startsWith('Error:') || line.startsWith('Fatal:')) { //Fatal|Error|Note
 				this.emit(TerminalEscape.apply({ msg: line, style: [TE_Style.Red] }));
 			} else if (line.startsWith('Warning:')) {
