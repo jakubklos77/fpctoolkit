@@ -9,6 +9,8 @@ export class EditorCommandManager {
     registerAll(context: vscode.ExtensionContext) {
 
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.trimfromcursor', this.TrimFromCursor));
+        context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.jumpToPreviousIndent', this.JumpToPreviousIndent));
+        context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.jumpToNextIndent', this.JumpToNextIndent));
 
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.base64encode', this.Base64Encode));
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.base64decode', this.Base64Decode));
@@ -111,6 +113,102 @@ export class EditorCommandManager {
             await editor.edit(editBuilder => {
                 editBuilder.delete(range);
             });
+        }
+    };
+
+    private getIndentLevel(line: string): number {
+        return line.search(/\S|$/); // Index of first non-whitespace char
+    }
+
+    private isNotBlank(line: string): boolean {
+        return line.trim().length > 0;
+    }
+
+    private findFirstNonBlankLine(doc: vscode.TextDocument, start: number, direction: -1 | 1): number {
+        const limit = direction === -1 ? 0 : doc.lineCount - 1;
+        for (let i = start; direction === -1 ? i >= limit : i <= limit; i += direction) {
+            if (this.isNotBlank(doc.lineAt(i).text)) {
+                return i;
+            }
+        }
+        return start;
+    }
+
+    JumpToPreviousIndent = async (textEditor: TextEditor, edit: TextEditorEdit) => {
+
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) return;
+
+        const doc = editor.document;
+        const cursorLine = editor.selection.active.line;
+
+        const baseLine = this.findFirstNonBlankLine(doc, cursorLine, -1);
+        let baseIndent = this.getIndentLevel(doc.lineAt(baseLine).text);
+
+        let first = true;
+        for (let i = baseLine - 1; i >= 0; i--) {
+            const text = doc.lineAt(i).text;
+            if (!this.isNotBlank(text))
+                continue;
+
+            // First next line
+            if (first) {
+                first = false;
+
+                // We go deeper
+                let firstLevel = this.getIndentLevel(text);
+                if (firstLevel > baseIndent) {
+                    // Set new base indent
+                    baseIndent = firstLevel;
+                }
+            }
+
+            if (this.getIndentLevel(text) < baseIndent) {
+                const targetCol = this. getIndentLevel(text);
+                const pos = new vscode.Position(i, targetCol);
+                editor.selection = new vscode.Selection(pos, pos);
+                editor.revealRange(new vscode.Range(pos, pos));
+                return;
+            }
+        }
+    };
+
+    JumpToNextIndent = async (textEditor: TextEditor, edit: TextEditorEdit) => {
+
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) return;
+
+        const doc = editor.document;
+        const totalLines = doc.lineCount;
+        const cursorLine = editor.selection.active.line;
+
+        const baseLine = this.findFirstNonBlankLine(doc, cursorLine, 1);
+        let baseIndent = this.getIndentLevel(doc.lineAt(baseLine).text);
+
+        let first = true;
+        for (let i = baseLine + 1; i < totalLines; i++) {
+            const text = doc.lineAt(i).text;
+            if (!this.isNotBlank(text))
+                continue;
+
+            // First next line
+            if (first) {
+                first = false;
+
+                // We go deeper
+                let firstLevel = this.getIndentLevel(text);
+                if (firstLevel > baseIndent) {
+                    // Set new base indent
+                    baseIndent = firstLevel;
+                }
+            }
+            if (this.getIndentLevel(text) < baseIndent) {
+                const targetCol = this.getIndentLevel(text);
+                const pos = new vscode.Position(i, targetCol);
+                editor.selection = new vscode.Selection(pos, pos);
+                editor.revealRange(new vscode.Range(pos, pos));
+                return;
+            }
         }
     };
 

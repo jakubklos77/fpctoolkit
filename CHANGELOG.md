@@ -1,6 +1,7 @@
 ## [1.2.7] - 2025-04-30
 ## add:
 - FPC Error 5088 handled as a Warning not to hide the primary error
+- Jump to next and previous indentation block support - Ctrl+Shift+[ and Control+Shift+]
 ## fix:
 - Rename vs unsaved document fixed
 - Problem match - order of units preserved

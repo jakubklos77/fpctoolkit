@@ -139,6 +139,14 @@
         "title": "%editor.trimfromcursor%"
       },
       {
+        "command": "fpctoolkit.editor.jumpToPreviousIndent",
+        "title": "%editor.jumpToPreviousIndent%"
+      },
+      {
+        "command": "fpctoolkit.editor.jumpToNextIndent",
+        "title": "%editor.jumpToNextIndent%"
+      },
+      {
         "command": "fpctoolkit.code.complete",
         "title": "%code.complete%"
       },
@@ -194,6 +202,16 @@
       {
         "key": "ctrl+t",
         "command": "fpctoolkit.editor.trimfromcursor",
+        "when": "editorTextFocus && !isInEmbeddedEditor"
+      },
+      {
+        "key": "ctrl+shift+[",
+        "command": "fpctoolkit.editor.jumpToPreviousIndent",
+        "when": "editorTextFocus && !isInEmbeddedEditor"
+      },
+      {
+        "key": "ctrl+shift+]",
+        "command": "fpctoolkit.editor.jumpToNextIndent",
         "when": "editorTextFocus && !isInEmbeddedEditor"
       },
       {

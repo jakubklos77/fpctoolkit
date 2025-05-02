@@ -61,6 +61,9 @@
     "config.format.cfgpath": "The path of jcfsettings.cfg.",
 
     "editor.trimfromcursor": "Delete to end of word",
+    "editor.jumpToPreviousIndent": "Jump to previous indent",
+    "editor.jumpToNextIndent": "Jump to next indent",
+
     "editor.base64encode": "Base64 encode",
     "editor.base64decode": "Base64 decode",
     "editor.hexencode": "Hex encode",
