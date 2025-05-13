@@ -159,7 +159,7 @@ export class EditorCommandManager {
                 let firstLevel = this.getIndentLevel(text);
                 if (firstLevel > baseIndent) {
                     // Set new base indent
-                    baseIndent = firstLevel;
+                    baseIndent += 1;
                 }
             }
 
@@ -199,7 +199,7 @@ export class EditorCommandManager {
                 let firstLevel = this.getIndentLevel(text);
                 if (firstLevel > baseIndent) {
                     // Set new base indent
-                    baseIndent = firstLevel;
+                    baseIndent += 1;
                 }
             }
             if (this.getIndentLevel(text) < baseIndent) {

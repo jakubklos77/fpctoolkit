@@ -1,3 +1,7 @@
+## [1.2.8]
+## fix:
+- Jump to next and previous indentation block support enhanced
+
 ## [1.2.7] - 2025-05-13
 ## add:
 - FPC Error 5088 handled as a Warning not to hide the primary error
