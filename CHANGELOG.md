@@ -1,4 +1,4 @@
-## [1.2.7] - 2025-04-30
+## [1.2.7] - 2025-05-13
 ## add:
 - FPC Error 5088 handled as a Warning not to hide the primary error
 - Jump to next and previous indentation block support - Ctrl+Shift+[ and Control+Shift+]
