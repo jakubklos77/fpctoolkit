@@ -1,6 +1,7 @@
 ## [1.2.8]
 ## fix:
 - Jump to next and previous indentation block support enhanced
+- new pasls versions
 
 ## [1.2.7] - 2025-05-13
 ## add:
