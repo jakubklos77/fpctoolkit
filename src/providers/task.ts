@@ -370,7 +370,7 @@ class FpcBuildTaskTerminal implements vscode.Pseudoterminal, vscode.TerminalExit
 			const e = this.args[index];
 			if (e.startsWith('-Fu')) {
 				let f2 = e.substring(3);
-				if (f2.startsWith('.')) {
+				if (!f2.startsWith('/')) {
 					f = path.join(this.cwd, f2, filename);
 				} else {
 					f = path.join(f2, filename);

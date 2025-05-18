@@ -101,15 +101,41 @@ class LazProject {
 
                         lazProjectResult = new LazProjectOptions();
 
-                        this.processOptionStringList(lazProjectResult.IncludeFiles, ";", result.CONFIG.CompilerOptions[0].SearchPaths[0].IncludeFiles[0].$.Value);
-                        this.processOptionStringList(lazProjectResult.OtherUnitFiles, ";", result.CONFIG.CompilerOptions[0].SearchPaths[0].OtherUnitFiles[0].$.Value);
-                        this.processOptionStringList(lazProjectResult.CustomOptions, "\n", result.CONFIG.CompilerOptions[0].Other[0].CustomOptions[0].$.Value);
+                        if (result.CONFIG.CompilerOptions[0].SearchPaths[0].IncludeFiles?.[0]?.$?.Value)
+                            this.processOptionStringList(lazProjectResult.IncludeFiles, ";", result.CONFIG.CompilerOptions[0].SearchPaths[0].IncludeFiles[0].$.Value);
 
-                        lazProjectResult.SyntaxMode = result.CONFIG.CompilerOptions[0].Parsing[0].SyntaxOptions[0].SyntaxMode[0].$.Value;
-                        lazProjectResult.Target = this.replaceStringWithEnvVar(result.CONFIG.CompilerOptions[0].Target[0].Filename[0].$.Value);
-                        lazProjectResult.CWD = path.dirname(lazProjectResult.Target);
-                        lazProjectResult.MainFile = path.join(path.dirname(project), result.CONFIG.ProjectOptions[0].Units[0].Unit0[0].Filename[0].$.Value);
-                        lazProjectResult.HostApplication = result.CONFIG.ProjectOptions[0].RunParams?.[0].local?.[0].HostApplicationFilename?.[0].$.Value;
+                        if (result.CONFIG.CompilerOptions[0].SearchPaths[0].OtherUnitFiles?.[0]?.$?.Value)
+                            this.processOptionStringList(lazProjectResult.OtherUnitFiles, ";", result.CONFIG.CompilerOptions[0].SearchPaths[0].OtherUnitFiles[0].$.Value);
+
+                        if (result.CONFIG.CompilerOptions[0].Other?.[0]?.CustomOptions?.[0]?.$?.Value)
+                            this.processOptionStringList(lazProjectResult.CustomOptions, "\n", result.CONFIG.CompilerOptions[0].Other[0].CustomOptions[0].$.Value);
+
+                        if (result.CONFIG.CompilerOptions[0]?.Parsing?.[0]?.SyntaxOptions?.[0]?.SyntaxMode?.[0]?.$?.Value)
+                            lazProjectResult.SyntaxMode = result.CONFIG.CompilerOptions[0].Parsing[0].SyntaxOptions[0].SyntaxMode[0].$.Value;
+
+                        if (result.CONFIG.CompilerOptions[0]?.Target?.[0]?.Filename?.[0]?.$?.Value) {
+                            // Target
+                            lazProjectResult.Target = this.replaceStringWithEnvVar(result.CONFIG.CompilerOptions[0].Target[0].Filename[0].$.Value);
+
+                            // Absolute path
+                            if (!lazProjectResult.Target.startsWith('/'))
+                                lazProjectResult.Target = path.join(path.dirname(project), lazProjectResult.Target);
+
+                            // Get dir
+                            lazProjectResult.CWD = path.dirname(lazProjectResult.Target);
+                        }
+
+                        if (result.CONFIG.ProjectOptions?.[0]?.Units?.[0]?.Unit0?.[0]?.Filename?.[0]?.$?.Value)
+                            lazProjectResult.MainFile = path.join(path.dirname(project), result.CONFIG.ProjectOptions[0].Units[0].Unit0[0].Filename[0].$.Value);
+
+                        // This one already had optional chaining, but making it more comprehensive
+                        if (result.CONFIG.ProjectOptions?.[0]?.RunParams?.[0]?.local?.[0]?.HostApplicationFilename?.[0]?.$?.Value) {
+                            lazProjectResult.HostApplication = result.CONFIG.ProjectOptions[0].RunParams[0].local[0].HostApplicationFilename[0].$.Value;
+
+                            // Absolute path
+                            if (!lazProjectResult.HostApplication.startsWith('/'))
+                                lazProjectResult.HostApplication = path.join(path.dirname(project), lazProjectResult.HostApplication);
+                        }
                     }
                 });
             } catch (error) {
@@ -217,9 +243,15 @@ class LazProject {
         // Get latest modified source file timestamp
         const getLatestSourceTime = (dir: string): number => {
             let latestTime = 0;
+
             const files = fs.readdirSync(dir);
 
             for (const file of files) {
+
+                // Ignore file extensions
+                if (/\.(ppu|o|compiled|git)$/i.test(file))
+                    continue;
+
                 const filePath = path.join(dir, file);
                 const stats = fs.statSync(filePath);
 
@@ -229,6 +261,7 @@ class LazProject {
                     latestTime = Math.max(latestTime, stats.mtimeMs);
                 }
             }
+
             return latestTime;
         };
 

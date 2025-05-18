@@ -2,6 +2,8 @@
 ## fix:
 - Jump to next and previous indentation block support enhanced
 - new pasls versions
+- project and cwd relative paths solved
+- check for rebuild enhanced (ignores some files .ppu, .o, .git and .compiled)
 
 ## [1.2.7] - 2025-05-13
 ## add:

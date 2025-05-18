@@ -94,7 +94,7 @@ export class CompileOption {
         }
         if (this.buildOption?.outputFile) {
             let outfile = this.buildOption!.outputFile;
-            if (outfile.startsWith(".")) {
+            if (!outfile.startsWith("/")) {
                 outfile = path.join(vscode.workspace.workspaceFolders![0].uri.fsPath, outfile);
             }
             let dir = path.dirname(outfile);
@@ -127,7 +127,7 @@ export class CompileOption {
         if (this.buildOption?.unitOutputDir) {
             let dir = this.buildOption!.unitOutputDir;
 
-            if (dir.startsWith(".")) {
+            if (!dir.startsWith("/")) {
                 dir = path.join(vscode.workspace.workspaceFolders![0].uri.fsPath, dir);
             }
 

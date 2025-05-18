@@ -177,10 +177,18 @@ export class FpcCommandManager {
         if (!project)
             return "";
 
-        if (project.HostApplication)
-            return project.HostApplication;
+        let program = "";
 
-        return project.Target;
+        // Host application
+        if (project.HostApplication)
+            program = project.HostApplication;
+
+        // Target
+        if (program === '')
+            program = project.Target;
+
+        // Return
+        return program;
     };
 
     GetCWD = async (node?: FpcItem) => {
@@ -189,16 +197,21 @@ export class FpcCommandManager {
         if (!project)
             return "";
 
-        if (project.HostApplication)
-            return path.dirname(project.HostApplication);
+        let cwd = "";
 
-        let cwd = project.CWD;
-        if (cwd === '' || cwd === '.') {
+        // Host application
+        if (project.HostApplication)
+            cwd = path.dirname(project.HostApplication);
+
+        // CWD
+        if (cwd === '' || cwd === '.')
+            cwd = project.CWD;
+
+        // Target and fallback
+        if (cwd === '' || cwd === '.')
             cwd = path.dirname(project.Target);
-        }
-        if (cwd === '' || cwd === '.') {
+        if (cwd === '' || cwd === '.')
             cwd = path.dirname(project.MainFile);
-        }
 
         return cwd;
     };
@@ -299,7 +312,7 @@ end.`;
 
             if (definition?.cwd) {
                 let cur_dir=definition.cwd;
-                if(cur_dir.startsWith('./') || cur_dir.startsWith('.\\')){
+                if(!cur_dir.startsWith('/')){
                     cur_dir=path.join(this.workspaceRoot,definition.cwd);
                 }
                 dir = path.join(cur_dir, dir);
