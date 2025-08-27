@@ -1,3 +1,7 @@
+## [1.2.9]
+## fix:
+- Editor commands available even it FPC project not active
+
 ## [1.2.8] 2025-05-20
 ## fix:
 - Jump to next and previous indentation block support enhanced

@@ -2,7 +2,7 @@
   "name": "fpctoolkit",
   "displayName": "FreePascal Toolkit",
   "description": "Free pascal compile and build.",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -31,7 +31,7 @@
     "url": "https://github.com/jakubklos77/fpctoolkit/issues"
   },
   "activationEvents": [
-    "onCommand:fpctoolkit.code.rename"
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
