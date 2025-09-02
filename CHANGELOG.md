@@ -1,4 +1,4 @@
-## [1.2.9]
+## [1.2.9] 2025-09-02
 ## fix:
 - Editor commands available even it FPC project not active
 
