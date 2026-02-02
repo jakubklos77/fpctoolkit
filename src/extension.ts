@@ -18,11 +18,15 @@ export let logger: vscode.OutputChannel;
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
 
+	logger = vscode.window.createOutputChannel('fpctoolkit');
+
+	// Register editor commands that don't require a workspace
+	// This allows commands like base64 encode/decode to work even without a workspace
 	if (!vscode.workspace.workspaceFolders) {
+		let commands = new FpcCommandManager('', context);
+		commands.registerAll();
 		return;
 	}
-
-	logger = vscode.window.createOutputChannel('fpctoolkit');
 
 	vscode.window.onDidChangeVisibleTextEditors(onDidChangeVisibleTextEditors);
 	vscode.workspace.onDidChangeTextDocument(onDidChangeTextDocument);

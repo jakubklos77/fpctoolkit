@@ -1,3 +1,7 @@
+## [1.2.10] 2026-01-02
+## fix:
+- Editor commands available even it no workspace opened
+
 ## [1.2.9] 2025-09-02
 ## fix:
 - Editor commands available even it FPC project not active
