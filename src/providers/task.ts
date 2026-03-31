@@ -201,7 +201,7 @@ export class FpcTask extends vscode.Task {
 
 					if (!lazbuild) {
 						let opt: CompileOption = new CompileOption(realDefinition);
-						buildOptionString = opt.toOptionString();
+						buildOptionString = opt.toOptionString(true);
 					}
 				}
 				if (!buildOptionString) {

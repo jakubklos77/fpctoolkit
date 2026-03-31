@@ -59,7 +59,7 @@ export class CompileOption {
 
     }
 
-    toOptionString() {
+    toOptionString(createDirs: boolean = false) {
         let fpccfg = configuration;
         let globalOption = {
             customOptions: fpccfg.get<string[]>('customOptions'),
@@ -98,7 +98,7 @@ export class CompileOption {
                 outfile = path.join(vscode.workspace.workspaceFolders![0].uri.fsPath, outfile);
             }
             let dir = path.dirname(outfile);
-            if (!fs.existsSync(dir)) {
+            if (createDirs && !fs.existsSync(dir)) {
                 try {
                     fs.mkdirSync(dir, { recursive: true });
                 } catch (error) {
@@ -131,7 +131,7 @@ export class CompileOption {
                 dir = path.join(vscode.workspace.workspaceFolders![0].uri.fsPath, dir);
             }
 
-            if (!fs.existsSync(dir)) {
+            if (createDirs && !fs.existsSync(dir)) {
                 try {
                     fs.mkdirSync(dir, { recursive: true });
                 } catch (error) {
