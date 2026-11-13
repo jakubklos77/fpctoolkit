@@ -181,6 +181,10 @@
       {
         "command": "fpctoolkit.editor.quotedprintabledecode",
         "title": "%editor.quotedprintabledecode%"
+      },
+      {
+        "command": "fpctoolkit.editor.openWritableWorkingTreeFile",
+        "title": "%editor.openWritableWorkingTreeFile%"
       }
     ],
     "keybindings": [
@@ -223,6 +227,12 @@
         "key": "ctrl+shift+g",
         "command": "fpctoolkit.editor.generateuuid",
         "when": "editorTextFocus && !isInEmbeddedEditor && editorLangId == 'objectpascal'"
+      },
+      {
+        "key": "ctrl+alt+w",
+        "mac": "cmd+alt+w",
+        "command": "fpctoolkit.editor.openWritableWorkingTreeFile",
+        "when": "editorFocus || activeEditor"
       }
     ],
     "taskDefinitions": [

@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { TextEditor, TextEditorEdit } from 'vscode';
+import { WorkingTreeCommandManager } from './workingtree';
 
 export class EditorCommandManager {
 
@@ -20,6 +21,8 @@ export class EditorCommandManager {
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.urldecode', this.URLDecode));
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.generateuuid', this.GenerateUUID));
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('fpctoolkit.editor.quotedprintabledecode', this.QuotedPrintableDecode));
+
+        new WorkingTreeCommandManager().registerAll(context);
     }
 
     TrimFromCursor = async (textEditor: TextEditor, edit: TextEditorEdit) => {

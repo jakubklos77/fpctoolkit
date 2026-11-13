@@ -71,5 +71,6 @@
     "editor.urlencode": "URL encode",
     "editor.urldecode": "URL decode",
     "editor.generateuuid": "Generate UUID",
-    "editor.quotedprintabledecode": "Quoted-printable decode"
+    "editor.quotedprintabledecode": "Quoted-printable decode",
+    "editor.openWritableWorkingTreeFile": "Open Writable Working-Tree File"
 }
