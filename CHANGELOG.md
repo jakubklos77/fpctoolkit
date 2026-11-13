@@ -1,4 +1,6 @@
-## [1.2.10] 2026-01-02
+## [1.2.10] 2026-11-13
+# add:
+- Ctrl+Alt+W and action: fpctoolkit.editor.openWritableWorkingTreeFile (open the filename in write mode from Source Control compare)
 ## fix:
 - Editor commands available even it no workspace opened
 
